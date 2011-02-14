@@ -11,6 +11,7 @@ public class Place {
 	private int xDist;
 	private int yDist;
 	private int zDist;
+        private int world;
 	private String name;
 	
 	public Place( Location loc, int radius, String name )

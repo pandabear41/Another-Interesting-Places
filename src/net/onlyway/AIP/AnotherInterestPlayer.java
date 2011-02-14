@@ -26,7 +26,7 @@ public class AnotherInterestPlayer extends PlayerListener {
     	plugin.removeCurrent( event.getPlayer() );
     }
 
-    @Override
+   /* @Override
     public void onPlayerCommand( PlayerChatEvent event )
     {
     	if ( event.isCancelled() )
@@ -34,7 +34,7 @@ public class AnotherInterestPlayer extends PlayerListener {
     	String[] args = event.getMessage().split( " ", 2 );
     	boolean b = false;
     	
-    	if ( ( args[ 0 ].equalsIgnoreCase( "/who" ) && !plugin.getConfig().disableWho() ) || args[ 0 ].equalsIgnoreCase( "/where" ) ) {
+    	if ( ( args[ 0 ].equalsIgnoreCase( "/who" ) && !plugin.getConfig().disableWho() ) ) {
     		if ( args.length <= 1 )
     			plugin.sendWho( event.getPlayer() );
     		else
@@ -109,7 +109,7 @@ public class AnotherInterestPlayer extends PlayerListener {
     	}
     	
     	event.setCancelled( b );
-    }
+    }*/
     
     @Override
     public void onPlayerMove( PlayerMoveEvent event )

@@ -2,9 +2,12 @@ package net.onlyway.AIP;
 
 import java.io.File;
 import java.util.HashMap;
+import org.bukkit.ChatColor;
 
 import org.bukkit.Location;
 import org.bukkit.Server;
+import org.bukkit.command.Command;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event.Priority;
 import org.bukkit.event.Event;
@@ -38,7 +41,7 @@ public class AnotherInterest extends JavaPlugin {
     {
         getServer().getPluginManager().registerEvent( Event.Type.PLAYER_JOIN,    player,  Priority.Normal, this );
         getServer().getPluginManager().registerEvent( Event.Type.PLAYER_QUIT,    player,  Priority.Normal, this );
-        getServer().getPluginManager().registerEvent( Event.Type.PLAYER_COMMAND, player,  Priority.Normal, this );
+        //getServer().getPluginManager().registerEvent( Event.Type.PLAYER_COMMAND, player,  Priority.Normal, this );
         getServer().getPluginManager().registerEvent( Event.Type.PLAYER_MOVE,    player,  Priority.Normal, this );
         getServer().getPluginManager().registerEvent( Event.Type.VEHICLE_MOVE,   vehicle, Priority.Normal, this );
     }
@@ -47,6 +50,69 @@ public class AnotherInterest extends JavaPlugin {
     public void onDisable()
     {
     }
+
+    @Override
+    public boolean onCommand(CommandSender sender, Command command, String commandLabel, String[] args) {
+        if (command.getName().equalsIgnoreCase("aip")) {
+            if (!(sender instanceof Player)) {
+                sender.sendMessage("Only players can use this command");
+                return false;
+            }
+
+            Player player = (Player) sender;
+            if ( args.length < 1 || !( (args[0].equalsIgnoreCase("mark") && args.length > 1) || args[0].equalsIgnoreCase("unmark") || args[0].equalsIgnoreCase("nearest") || args[0].equalsIgnoreCase("who"))) {
+                player.sendMessage(ChatColor.RED + "/aip <unmark,nearest,who>");
+                player.sendMessage(ChatColor.RED + "OR /aip mark [Name]:[Radius]");
+                player.sendMessage(ChatColor.RED + "OR /aip who [Player Name]");
+                player.sendMessage(ChatColor.RED + "mark - Mark a position on the map with a name.");
+                player.sendMessage(ChatColor.RED + "unmark - Unmark the nearest marked position");
+                player.sendMessage(ChatColor.RED + "nearest - Displays the nearest marked position");
+                player.sendMessage(ChatColor.RED + "who - List connected players and the areas they are in");
+                return false;
+            }
+           
+            if ( args[0].equalsIgnoreCase("mark") ) {
+                int r = -1;
+                String[] sstring = arrayToString(args, " ", 1).split(":");
+                if (sstring.length < 2) {
+                    player.sendMessage(ChatColor.RED + "Invalid Command Syntax!");
+                    player.sendMessage(ChatColor.RED + "USE /aip mark [Name]:[Radius]");
+                    return false;
+                }
+
+                String name = sstring[0];
+                String lprms = sstring[1];
+
+                try {
+                    r=Integer.parseInt(lprms);
+                } catch ( NumberFormatException e ) {
+                    player.sendMessage(ChatColor.RED + "Error in radius entry!");
+                    player.sendMessage(ChatColor.RED + "USE /aip mark [Name]:[Radius]");
+                    return false;
+                }
+                markPlace(player, name, r);
+            }
+        }
+        return true;
+
+
+    }
+
+    public static String arrayToString(String[] a, String separator) {
+        return arrayToString(a, separator, 0);
+    }
+    public static String arrayToString(String[] a, String separator, int init) {
+        StringBuilder result = new StringBuilder();
+        if (a.length > init) {
+            result.append(a[init]);
+            for (int i=init+1; i<a.length; i++) {
+                result.append(separator);
+                result.append(a[i]);
+            }
+        }
+        return result.toString();
+    }
+
     
     public Config getConfig()
     {
@@ -151,22 +217,22 @@ public class AnotherInterest extends JavaPlugin {
     		player.sendMessage( nearest.getDesc() );
     }
     
-    public void markPlace( Player player, String name, int radius, int xDist, int yDist, int zDist )
+    public void markPlace( Player player, String name, int radius )
     {
     	if ( config.opsOnly() && !player.isOp() ) {
-    		player.sendMessage( "§fops only!" );
+    		player.sendMessage( ChatColor.RED + "ops only!" );
     		return;
     	}
     	
     	Place nearest = nearestPlace( player );
     	
     	if ( nearest != null && nearest.distance( player.getLocation() ) < 100 ) {
-    		player.sendMessage( "§ftoo close to " + nearest.getDesc() + "!" );
+    		player.sendMessage( ChatColor.RED + "Too close to " + nearest.getDesc() + "!" );
     		return;
     	}
     	
     	if ( name == null || name.trim().equals( "" ) ) {
-    		player.sendMessage( "§fsupply a name!" );
+    		player.sendMessage( ChatColor.RED + "You must supply a name!" );
     		return;
     	}
     	
@@ -174,11 +240,11 @@ public class AnotherInterest extends JavaPlugin {
     	if ( radius > 0 )
     		mark = new Place( player.getLocation(), radius, name );
     	else
-    		mark = new Place( player.getLocation(), xDist, yDist, zDist, name );
+    		player.sendMessage( ChatColor.RED + "Error: Feature not implemented" );
     	
     	places.getPlaces().add( mark );
     	updatePlaces();
-    	player.sendMessage( "§fmarked " + mark.getDesc() );
+    	player.sendMessage( ChatColor.BLUE + "marked " + mark.getDesc() );
     	
     	for ( Player p : getServer().getOnlinePlayers() )
     		updateCurrent( p );

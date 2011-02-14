@@ -16,6 +16,9 @@ to use the marking feature.
 
 *******************************************************************************
 COMMAND:
+/aip mark [Name]
+<Makes the point the default radius>
+or
 /aip mark [Name]:[Radius]
 or
 /aip mark [Name]:[X],[Y],[Z]
