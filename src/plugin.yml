@@ -1,0 +1,12 @@
+name: AnotherInterestingPlaces
+main: net.onlyway.AIP.AnotherInterest
+version: 0.1
+website: http://onlywaysoftware.com
+author: Pandabear41
+description: >
+  Another Interesting Places plugin lets you give names to different areas of your world. 
+  When you wander around the would it will tell you when you arrive in different areas.
+commands:
+  aip:
+    description: Allows you to mark your positions on the map. Use "/aip" for help.
+
