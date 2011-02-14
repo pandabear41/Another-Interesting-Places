@@ -84,19 +84,13 @@ public class PlaceTree {
 
             public void nearest( Location loc )
             {
-                    float d = place.distance( loc );
+                    float d = (float) place.distance( loc );
                     if ( best == null || d < distance ) {
                             boolean constraint = true;
-                            if ( place.hasRadius() )
-                                    constraint = d <= place.getRadius();
-                            else {
-                                    if ( place.hasXDist() )
-                                            constraint = constraint && Math.abs( place.getX() - loc.getBlockX() ) <= place.getXDist();
-                                    if ( place.hasYDist() )
-                                            constraint = constraint && Math.abs( place.getY() - loc.getBlockY() ) <= place.getYDist();
-                                    if ( place.hasZDist() )
-                                            constraint = constraint && Math.abs( place.getZ() - loc.getBlockZ() ) <= place.getZDist();
-                            }
+                            //if ( place.hasRadius() )
+                            
+                            constraint = d <= place.getRadius();
+
                             if ( constraint ) {
                                     best = place;
                                     distance = d;

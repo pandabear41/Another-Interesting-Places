@@ -3,10 +3,16 @@ package net.onlyway.AIP;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class Places {
 	
@@ -17,24 +23,22 @@ public class Places {
     {
             this.plugin = plugin;
             try {
-                BufferedReader reader = new BufferedReader( new FileReader( plugin.getDataFolder() + File.separator + AnotherInterest.DATA_FILE ) );
-                boolean b = true;
-                boolean v1_1 = false;
-                String s = reader.readLine();
-                if ( s.equals( AnotherInterest.VERSION_1_1 ) ) {
-                    v1_1 = true;
-                    s = reader.readLine();
-                }
-                while ( b ) {
-                    try {
-                            places.add( new Place( s, v1_1 ) );
+                FileInputStream reader = new FileInputStream( plugin.getDataFolder() + File.separator + AnotherInterest.DATA_FILE);
+                ObjectInputStream oin = new ObjectInputStream (reader);
+
+
+                Object obj = null ;
+                try {
+                    while ((obj = oin.readObject()) != null) {
+                        if (obj instanceof Place) {
+                            Place plac = (Place) obj;
+                            places.add(plac);
+                        }
                     }
-                    catch ( Exception e ) {
-                    }
-                    s = reader.readLine();
-                    b = s != null;
+                } catch (ClassNotFoundException ex) {
                 }
-                reader.close();
+
+
             }
             catch ( IOException e ) {
             }
@@ -48,11 +52,13 @@ public class Places {
     void updateData()
     {
         try {
-                plugin.getDataFolder().mkdir();
-            BufferedWriter writer = new BufferedWriter( new FileWriter( plugin.getDataFolder() + File.separator + AnotherInterest.DATA_FILE ) );
-            writer.write( AnotherInterest.VERSION_1_1 + "\n" );
+            plugin.getDataFolder().mkdir();
+            FileOutputStream writer = new FileOutputStream(plugin.getDataFolder() + File.separator + AnotherInterest.DATA_FILE);
+
+            // Write object with ObjectOutputStream
+            ObjectOutputStream oout = new ObjectOutputStream (writer);;
             for ( Place p : places )
-                writer.write( p.saveString() + "\n" );
+                oout.writeObject(p);
             writer.close();
         }
         catch ( IOException e ) {

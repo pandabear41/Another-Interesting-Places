@@ -150,7 +150,7 @@ public class AnotherInterest extends JavaPlugin {
     		return;
     	
     	Place place = nearestPlace( player );
-    	
+        player.sendMessage(ChatColor.WHITE + "Distance from:" + place.distance(player.getLocation()));
 		Place old = null;
 		if ( current.containsKey( player ) )
 			old = current.get( player );
@@ -214,7 +214,7 @@ public class AnotherInterest extends JavaPlugin {
     {
     	Place nearest = nearestPlace( player );
     	if ( nearest != null )
-    		player.sendMessage( nearest.getDesc() );
+    		player.sendMessage( nearest.toString() );
     }
     
     public void markPlace( Player player, String name, int radius )
@@ -227,7 +227,7 @@ public class AnotherInterest extends JavaPlugin {
     	Place nearest = nearestPlace( player );
     	
     	if ( nearest != null && nearest.distance( player.getLocation() ) < 100 ) {
-    		player.sendMessage( ChatColor.RED + "Too close to " + nearest.getDesc() + "!" );
+    		player.sendMessage( ChatColor.RED + "Too close to " + nearest.toString() + "!" );
     		return;
     	}
     	
@@ -238,13 +238,13 @@ public class AnotherInterest extends JavaPlugin {
     	
     	Place mark = null;
     	if ( radius > 0 )
-    		mark = new Place( player.getLocation(), radius, name );
+    		mark = new Place( player.getLocation(), radius, (int) player.getWorld().getId(), name );
     	else
     		player.sendMessage( ChatColor.RED + "Error: Feature not implemented" );
     	
     	places.getPlaces().add( mark );
     	updatePlaces();
-    	player.sendMessage( ChatColor.BLUE + "marked " + mark.getDesc() );
+    	player.sendMessage( ChatColor.BLUE + "marked " + mark.toString() );
     	
     	for ( Player p : getServer().getOnlinePlayers() )
     		updateCurrent( p );
@@ -266,7 +266,7 @@ public class AnotherInterest extends JavaPlugin {
     	
     	places.getPlaces().remove( nearest );
     	updatePlaces();
-    	player.sendMessage( "§funmarked " + nearest.getDesc() );
+    	player.sendMessage( "§funmarked " + nearest.toString() );
     	
     	for ( Player p : getServer().getOnlinePlayers() )
     		updateCurrent( p );

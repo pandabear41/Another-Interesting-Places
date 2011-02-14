@@ -1,8 +1,11 @@
 package net.onlyway.AIP;
 
+import java.io.Serializable;
+import org.bukkit.ChatColor;
 import org.bukkit.Location;
 
-public class Place {
+
+public class Place implements Serializable {
 	
     private int x;
     private int y;
@@ -29,8 +32,8 @@ public class Place {
     {
             double r = 0;
             r += Math.pow( x - loc.getBlockX(), 2);
-            r += Math.pow( x - loc.getBlockY(), 2);
-            r += Math.pow( x - loc.getBlockZ(), 2);
+            r += Math.pow( y - loc.getBlockY(), 2);
+            r += Math.pow( z - loc.getBlockZ(), 2);
             return Math.sqrt(r);
     }
 
@@ -73,7 +76,7 @@ public class Place {
     @Override
     public String toString() {
 
-        return "";
+        return ChatColor.WHITE + name + " [" + Integer.toString( x ) + ", " + Integer.toString( y ) + ", " + Integer.toString( z ) + ", Radius:" + Integer.toString( radius ) + "]";
     }
 	
 //	public Place( String s, boolean v1_1 )
