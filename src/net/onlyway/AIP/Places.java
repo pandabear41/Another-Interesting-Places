@@ -1,18 +1,12 @@
 package net.onlyway.AIP;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 public class Places {
 	
@@ -55,7 +49,6 @@ public class Places {
             plugin.getDataFolder().mkdir();
             FileOutputStream writer = new FileOutputStream(plugin.getDataFolder() + File.separator + AnotherInterest.DATA_FILE);
 
-            // Write object with ObjectOutputStream
             ObjectOutputStream oout = new ObjectOutputStream (writer);;
             for ( Place p : places )
                 oout.writeObject(p);

@@ -159,9 +159,14 @@ public class AnotherInterest extends JavaPlugin {
 			if ( place == null ) {
 				if ( old != null || !config.leavingUsesArg() )
 					player.sendMessage( config.leaving( old != null ? old.getName() : "" ) );
-			}
-			else
-				player.sendMessage( config.entering( place.getName() ) );
+			} else {
+                            if (place.distance(player.getLocation()) <= place.getRadius()) {
+                                player.sendMessage( config.entering( place.getName() ) );
+                            } else {
+                                place=null;
+                                player.sendMessage( config.leaving( old != null ? old.getName() : "" ) );
+                            }
+                        }	
 			times.put( player, System.currentTimeMillis() );
 		}
 		
