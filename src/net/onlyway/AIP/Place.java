@@ -4,26 +4,77 @@ import org.bukkit.Location;
 
 public class Place {
 	
-	private int x;
-	private int y;
-	private int z;
-	private int radius;
-        // I don't think this is even needed.
-	//private int xDist;
-	//private int yDist;
-	//private int zDist;
-        private int world;
-	private String name;
-	
-	public Place( Location loc, int radius, int world, String name )
-	{
-		x = loc.getBlockX();
-		y = loc.getBlockY();
-		z = loc.getBlockZ();
-		this.radius = radius;
-		this.name = name;
-                this.world = world;
-	}
+    private int x;
+    private int y;
+    private int z;
+    private int radius;
+    // I don't think this is even needed.
+    //private int xDist;
+    //private int yDist;
+    //private int zDist;
+    private int world;
+    private String name;
+
+    public Place( Location loc, int radius, int world, String name )
+    {
+            x = loc.getBlockX();
+            y = loc.getBlockY();
+            z = loc.getBlockZ();
+            this.radius = radius;
+            this.name = name;
+            this.world = world;
+    }
+
+    public double distance( Location loc )
+    {
+            double r = 0;
+            r += Math.pow( x - loc.getBlockX(), 2);
+            r += Math.pow( x - loc.getBlockY(), 2);
+            r += Math.pow( x - loc.getBlockZ(), 2);
+            return Math.sqrt(r);
+    }
+
+    public int getX()
+    {
+            return x;
+    }
+
+    public int getY()
+    {
+            return y;
+    }
+
+    public int getZ()
+    {
+            return z;
+    }
+
+    public float getRadius()
+    {
+            return radius * radius;
+    }
+
+    public boolean hasRadius()
+    {
+            return radius > 0;
+    }
+
+    public int getWorld()
+    {
+            return world;
+    }
+
+    public String getName()
+    {
+            return name;
+    }
+
+
+    @Override
+    public String toString() {
+
+        return "";
+    }
 	
 //	public Place( String s, boolean v1_1 )
 //	{
@@ -66,49 +117,7 @@ public class Place {
 //		return "xyz " + Integer.toString( getX() ) + " " + Integer.toString( getY() ) + " " + Integer.toString( getZ() ) + " " + Integer.toString( xDist ) + " " + Integer.toString( yDist ) + " " + Integer.toString( zDist ) + " " + getName().replaceAll( "§", "##" );
 //	}
 
-	public double distance( Location loc )
-	{
-		double r = 0;
-		r += Math.pow( x - loc.getBlockX(), 2);
-		r += Math.pow( x - loc.getBlockY(), 2);
-		r += Math.pow( x - loc.getBlockZ(), 2);
-		return Math.sqrt(r);
-	}
-	
-	public int getX()
-	{
-		return x;
-	}
-	
-	public int getY()
-	{
-		return y;
-	}
-	
-	public int getZ()
-	{
-		return z;
-	}
-	
-	public float getRadius()
-	{
-		return radius * radius;
-	}
-	
-	public boolean hasRadius()
-	{
-		return radius > 0; 
-	}
 
-        public int getWorld()
-	{
-		return world;
-	}
-
-        public String getName()
-	{
-		return name;
-	}
 	
 //	public int getXDist()
 //	{
