@@ -26,14 +26,13 @@ public class AnotherInterest extends JavaPlugin {
     private final Places places = new Places( this );
     private final Config config = new Config( this );
     
-    private PlaceTree placeTree = null;
-    private HashMap< Player, Place > current = new HashMap< Player, Place >();
-    private HashMap< Player, Long > times = new HashMap< Player, Long >();
+    private HashMap<Player,Place> current = new HashMap<Player,Place>();
+    private HashMap<Player,Long> times = new HashMap<Player,Long>();
 
     public AnotherInterest( PluginLoader loader, Server server, PluginDescriptionFile pdf, File dir, File plugin, ClassLoader classLoader )
     {
         super( loader, server, pdf, dir, plugin, classLoader );
-    	updatePlaces();
+    	places.updateData();
     }
 
     @Override
@@ -41,7 +40,6 @@ public class AnotherInterest extends JavaPlugin {
     {
         getServer().getPluginManager().registerEvent( Event.Type.PLAYER_JOIN,    player,  Priority.Normal, this );
         getServer().getPluginManager().registerEvent( Event.Type.PLAYER_QUIT,    player,  Priority.Normal, this );
-        //getServer().getPluginManager().registerEvent( Event.Type.PLAYER_COMMAND, player,  Priority.Normal, this );
         getServer().getPluginManager().registerEvent( Event.Type.PLAYER_MOVE,    player,  Priority.Normal, this );
         getServer().getPluginManager().registerEvent( Event.Type.VEHICLE_MOVE,   vehicle, Priority.Normal, this );
     }
@@ -49,6 +47,7 @@ public class AnotherInterest extends JavaPlugin {
     @Override
     public void onDisable()
     {
+        places.updateData();
     }
 
     @Override
@@ -63,6 +62,7 @@ public class AnotherInterest extends JavaPlugin {
             if ( args.length < 1 || !( (args[0].equalsIgnoreCase("mark") && args.length > 1) || args[0].equalsIgnoreCase("unmark") || args[0].equalsIgnoreCase("nearest") || args[0].equalsIgnoreCase("who"))) {
                 player.sendMessage(ChatColor.RED + "/aip <unmark,nearest,who>");
                 player.sendMessage(ChatColor.RED + "OR /aip mark [Name]:[Radius]");
+                //player.sendMessage(ChatColor.RED + "OR /aip mark [Name]:[Radius],[Height]");
                 player.sendMessage(ChatColor.RED + "OR /aip who [Player Name]");
                 player.sendMessage(ChatColor.RED + "mark - Mark a position on the map with a name.");
                 player.sendMessage(ChatColor.RED + "unmark - Unmark the nearest marked position");
@@ -139,38 +139,40 @@ public class AnotherInterest extends JavaPlugin {
 
     private Place nearestPlace( Player player )
     {
-    	if ( placeTree == null )
+    	if ( places == null )
     		return null;
-    	return placeTree.nearest( player.getLocation() );
+    	return places.getNearest( player.getLocation() );
     }
-    
+
+    private Place nearestPlaceInRange( Player player )
+    {
+    	if ( places == null )
+    		return null;
+    	return places.getNearestRadius( player.getLocation() );
+    }
+
     public void updateCurrent( Player player )
     {
     	if ( times.containsKey( player ) && System.currentTimeMillis() - times.get( player ) < 8000 )
     		return;
     	
-    	Place place = nearestPlace( player );
-        player.sendMessage(ChatColor.WHITE + "Distance from:" + place.distance(player.getLocation()));
-		Place old = null;
-		if ( current.containsKey( player ) )
-			old = current.get( player );
+    	Place place = nearestPlaceInRange( player );
+        if (place != null) player.sendMessage(ChatColor.WHITE + "Distance from:" + place.distance(player.getLocation()));
+        Place old = null;
+        if ( current.containsKey( player ) )
+            old = current.get( player );
+
+        if ( ( place != old || !current.containsKey( player ) ) && !( old != null && place != null && old.getName().equals( place.getName() ) ) ) {
+            if ( place == null ) {
+                if ( old != null || !config.leavingUsesArg() )
+                    player.sendMessage( config.leaving( old != null ? old.getName() : "" ) );
+            } else {
+                player.sendMessage( config.entering( place.getName()));
+            }
+            times.put( player, System.currentTimeMillis() );
+        }
 		
-		if ( ( place != old || !current.containsKey( player ) ) && !( old != null && place != null && old.getName().equals( place.getName() ) ) ) {
-			if ( place == null ) {
-				if ( old != null || !config.leavingUsesArg() )
-					player.sendMessage( config.leaving( old != null ? old.getName() : "" ) );
-			} else {
-                            if (place.distance(player.getLocation()) <= place.getRadius()) {
-                                player.sendMessage( config.entering( place.getName() ) );
-                            } else {
-                                place=null;
-                                player.sendMessage( config.leaving( old != null ? old.getName() : "" ) );
-                            }
-                        }	
-			times.put( player, System.currentTimeMillis() );
-		}
-		
-		current.put( player, place );
+        current.put( player, place );
     }
     
     public void removeCurrent( Player player )
@@ -231,7 +233,7 @@ public class AnotherInterest extends JavaPlugin {
     	
     	Place nearest = nearestPlace( player );
     	
-    	if ( nearest != null && nearest.distance( player.getLocation() ) < 100 ) {
+    	if ( nearest != null && nearest.distance( player.getLocation() ) < 5 ) {
     		player.sendMessage( ChatColor.RED + "Too close to " + nearest.toString() + "!" );
     		return;
     	}
@@ -247,8 +249,8 @@ public class AnotherInterest extends JavaPlugin {
     	else
     		player.sendMessage( ChatColor.RED + "Error: Feature not implemented" );
     	
-    	places.getPlaces().add( mark );
-    	updatePlaces();
+    	places.addPlace(mark);
+        places.updateData();
     	player.sendMessage( ChatColor.BLUE + "marked " + mark.toString() );
     	
     	for ( Player p : getServer().getOnlinePlayers() )
@@ -270,7 +272,7 @@ public class AnotherInterest extends JavaPlugin {
     	}
     	
     	places.getPlaces().remove( nearest );
-    	updatePlaces();
+    	places.updateData();
     	player.sendMessage( "§funmarked " + nearest.toString() );
     	
     	for ( Player p : getServer().getOnlinePlayers() )
@@ -278,10 +280,5 @@ public class AnotherInterest extends JavaPlugin {
     }
     
     
-    private void updatePlaces()
-    {
-    	placeTree = new PlaceTree( places.getPlaces() );
-    	places.updateData();
-    }
     
 }

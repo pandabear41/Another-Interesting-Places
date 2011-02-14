@@ -37,6 +37,11 @@ public class Place implements Serializable {
             return Math.sqrt(r);
     }
 
+    public boolean inRange( Location loc )
+    {
+        return distance(loc) <= radius;
+    }
+
     public int getX()
     {
             return x;
