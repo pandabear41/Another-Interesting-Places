@@ -17,19 +17,18 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 public class AnotherInterest extends JavaPlugin {
 	
-    public static final String VERSION_1_1 = "version1.1";
     public static final String DATA_FILE = "places.txt";
     public static final String CONFIG_FILE = "config.txt";
 
-    private final AnotherInterestPlayer player = new AnotherInterestPlayer( this );
-    private final AnotherInterestVehicle vehicle = new AnotherInterestVehicle( this );
-    private final Places places = new Places( this );
-    private final Config config = new Config( this );
+    private final AnotherInterestPlayer player = new AnotherInterestPlayer(this);
+    private final AnotherInterestVehicle vehicle = new AnotherInterestVehicle(this);
+    private final Places places = new Places(this);
+    private final Config config = new Config(this);
     
     private HashMap<Player,Place> current = new HashMap<Player,Place>();
     private HashMap<Player,Long> times = new HashMap<Player,Long>();
 
-    public AnotherInterest( PluginLoader loader, Server server, PluginDescriptionFile pdf, File dir, File plugin, ClassLoader classLoader )
+    public AnotherInterest(PluginLoader loader, Server server, PluginDescriptionFile pdf, File dir, File plugin, ClassLoader classLoader)
     {
         super( loader, server, pdf, dir, plugin, classLoader );
     	places.updateData();
@@ -38,10 +37,10 @@ public class AnotherInterest extends JavaPlugin {
     @Override
     public void onEnable()
     {
-        getServer().getPluginManager().registerEvent( Event.Type.PLAYER_JOIN,    player,  Priority.Normal, this );
-        getServer().getPluginManager().registerEvent( Event.Type.PLAYER_QUIT,    player,  Priority.Normal, this );
-        getServer().getPluginManager().registerEvent( Event.Type.PLAYER_MOVE,    player,  Priority.Normal, this );
-        getServer().getPluginManager().registerEvent( Event.Type.VEHICLE_MOVE,   vehicle, Priority.Normal, this );
+        getServer().getPluginManager().registerEvent(Event.Type.PLAYER_JOIN,    player,  Priority.Normal, this);
+        getServer().getPluginManager().registerEvent(Event.Type.PLAYER_QUIT,    player,  Priority.Normal, this);
+        getServer().getPluginManager().registerEvent(Event.Type.PLAYER_MOVE,    player,  Priority.Normal, this);
+        getServer().getPluginManager().registerEvent(Event.Type.VEHICLE_MOVE,   vehicle, Priority.Normal, this);
     }
 
     @Override
@@ -59,7 +58,7 @@ public class AnotherInterest extends JavaPlugin {
             }
 
             Player player = (Player) sender;
-            if ( args.length < 1 || !( (args[0].equalsIgnoreCase("mark") && args.length > 1) || args[0].equalsIgnoreCase("unmark") || args[0].equalsIgnoreCase("nearest") || args[0].equalsIgnoreCase("who"))) {
+            if (args.length < 1 || !((args[0].equalsIgnoreCase("mark") && args.length > 1) || args[0].equalsIgnoreCase("unmark") || args[0].equalsIgnoreCase("nearest") || args[0].equalsIgnoreCase("who"))) {
                 player.sendMessage(ChatColor.RED + "/aip <unmark,nearest,who>");
                 player.sendMessage(ChatColor.RED + "OR /aip mark [Name]:[Radius]");
                 //player.sendMessage(ChatColor.RED + "OR /aip mark [Name]:[Radius],[Height]");
@@ -71,7 +70,7 @@ public class AnotherInterest extends JavaPlugin {
                 return false;
             }
            
-            if ( args[0].equalsIgnoreCase("mark") ) {
+            if (args[0].equalsIgnoreCase("mark")) {
                 int r = -1;
                 String[] sstring = arrayToString(args, " ", 1).split(":");
                 if (sstring.length < 2) {
@@ -91,17 +90,13 @@ public class AnotherInterest extends JavaPlugin {
                     return false;
                 }
                 markPlace(player, name, r);
-            } else if ( args[0].equalsIgnoreCase("unmark") ) {
+            } else if (args[0].equalsIgnoreCase("unmark")) {
                 unmarkPlace(player);
-            } else if  ( args[0].equalsIgnoreCase("nearest") ) {
+            } else if (args[0].equalsIgnoreCase("nearest")) {
                 sendNearest(player);
             }
-
-
         }
         return true;
-
-
     }
 
     public static String arrayToString(String[] a, String separator) {
@@ -125,145 +120,145 @@ public class AnotherInterest extends JavaPlugin {
     	return config;
     }
 
-    private Place nearestPlace( Player player )
+    private Place nearestPlace(Player player)
     {
-    	if ( places == null )
+    	if (places == null)
     		return null;
-    	return places.getNearest( player.getLocation(), (int) player.getWorld().getId() );
+    	return places.getNearest(player.getLocation(), (int) player.getWorld().getId());
     }
 
-    private Place nearestPlaceInRange( Player player )
+    private Place nearestPlaceInRange(Player player)
     {
-    	if ( places == null )
+    	if (places == null)
     		return null;
-    	return places.getNearestRadius( player.getLocation(), (int) player.getWorld().getId());
+    	return places.getNearestRadius(player.getLocation(), (int) player.getWorld().getId());
     }
 
-    public void updateCurrent( Player player )
+    public void updateCurrent(Player player)
     {
-    	if ( times.containsKey( player ) && System.currentTimeMillis() - times.get( player ) < 1000 )
+    	if (times.containsKey(player) && System.currentTimeMillis() - times.get( player ) < 3000 )
     		return;
     	
-    	Place place = nearestPlaceInRange( player );
+    	Place place = nearestPlaceInRange(player);
         if (place != null) player.sendMessage(ChatColor.WHITE + "Distance from:" + place.distance(player.getLocation()));
         Place old = null;
-        if ( current.containsKey( player ) )
-            old = current.get( player );
+        if (current.containsKey(player))
+            old = current.get(player);
 
-        if ( ( place != old || !current.containsKey( player ) ) && !( old != null && place != null && old.getName().equals( place.getName() ) ) ) {
+        if ((place != old || !current.containsKey(player)) && !(old != null && place != null && old.getName().equals(place.getName()))) {
             if ( place == null ) {
                 if ( old != null || !config.leavingUsesArg() )
-                    player.sendMessage( config.leaving( old != null ? old.getName() : "" ) );
+                    player.sendMessage(config.leaving( old != null ? old.getName() : "" ));
             } else {
-                player.sendMessage( config.entering( place.getName()));
+                player.sendMessage(config.entering( place.getName()));
             }
         }
-	times.put( player, System.currentTimeMillis() );
-        current.put( player, place );
+	times.put(player, System.currentTimeMillis());
+        current.put(player, place);
     }
     
-    public void removeCurrent( Player player )
+    public void removeCurrent(Player player)
     {
-    	current.remove( player );
-    	times.remove( player );
+    	current.remove(player);
+    	times.remove(player);
     }
     
-    public void sendWho( Player player )
+    public void sendWho(Player player)
     {
     	Player[] players = getServer().getOnlinePlayers();
-    	player.sendMessage( config.whoHead( Integer.toString( players.length ) ) );
-    	for ( Player p : players ) {
-			Place place = nearestPlace( p );
-		
-			if ( place == null )
-				player.sendMessage( config.whoLineNoPlace( p.getName() ) );
-			else
-				player.sendMessage( config.whoLinePlace( p.getName(), place.getName() ) );
+    	player.sendMessage(config.whoHead(Integer.toString(players.length)));
+    	for (Player p : players) {
+            Place place = nearestPlace(p);
+
+            if (place == null)
+                player.sendMessage(config.whoLineNoPlace(p.getName()));
+            else
+                player.sendMessage(config.whoLinePlace(p.getName(), place.getName()));
     	}
     }
     
-    public void sendWho( Player player, String who )
+    public void sendWho(Player player, String who)
     {
     	boolean b = false;
     	Player[] players = getServer().getOnlinePlayers();
-    	for ( Player p : players ) {
-    		if ( p.getName().equalsIgnoreCase( who ) ) {
-    			Location loc = p.getLocation();
-    			Place place = nearestPlace( p );
-    			
-    			if ( place == null )
-    				player.sendMessage( config.whoLineNoPlace( p.getName() ) );
-    			else
-    				player.sendMessage( config.whoLinePlace( p.getName(), place.getName() ) );
-    			player.sendMessage( "§f[" + Integer.toString( loc.getBlockX() ) + ", " + Integer.toString( loc.getBlockY() ) + ", " + Integer.toString( loc.getBlockZ() ) + "]" );
-    			b = true;
-    		}
+    	for (Player p : players) {
+            if (p.getName().equalsIgnoreCase(who)) {
+                Location loc = p.getLocation();
+                Place place = nearestPlace(p);
+
+                if (place == null)
+                    player.sendMessage(config.whoLineNoPlace(p.getName()));
+                else
+                    player.sendMessage(config.whoLinePlace(p.getName(), place.getName()));
+                player.sendMessage("§f[" + Integer.toString( loc.getBlockX() ) + ", " + Integer.toString( loc.getBlockY() ) + ", " + Integer.toString( loc.getBlockZ() ) + "]");
+                b = true;
+            }
     	}
-    	if ( !b ) {
-    		player.sendMessage( ChatColor.RED + "Player not found!" );
+    	if (!b) {
+    		player.sendMessage(ChatColor.RED + "Player not found!");
     	}
     }
     
-    public void sendNearest( Player player )
+    public void sendNearest(Player player)
     {
-    	Place nearest = nearestPlace( player );
-    	if ( nearest != null )
-    		player.sendMessage( nearest.toString() );
+    	Place nearest = nearestPlace(player);
+    	if (nearest != null)
+    		player.sendMessage(nearest.toString());
     }
     
-    public void markPlace( Player player, String name, int radius )
+    public void markPlace(Player player, String name, int radius)
     {
-    	if ( config.opsOnly() && !player.isOp() ) {
-    		player.sendMessage( ChatColor.RED + "ops only!" );
+    	if (config.opsOnly() && !player.isOp()) {
+    		player.sendMessage(ChatColor.RED + "ops only!");
     		return;
     	}
     	
-    	Place nearest = nearestPlace( player );
+    	Place nearest = nearestPlace(player);
     	
-    	if ( nearest != null && nearest.distance( player.getLocation() ) < 5 ) {
-    		player.sendMessage( ChatColor.RED + "Too close to " + nearest.toString() + "!" );
+    	if (nearest != null && nearest.distance( player.getLocation() ) < 5) {
+    		player.sendMessage(ChatColor.RED + "Too close to " + nearest.toString() + "!");
     		return;
     	}
     	
-    	if ( name == null || name.trim().equals( "" ) ) {
-    		player.sendMessage( ChatColor.RED + "You must supply a name!" );
+    	if (name == null || name.trim().equals( "" )) {
+    		player.sendMessage(ChatColor.RED + "You must supply a name!");
     		return;
     	}
     	
     	Place mark = null;
     	if ( radius > 0 )
-    		mark = new Place( player.getLocation(), radius, (int) player.getWorld().getId(), name );
+    		mark = new Place(player.getLocation(), radius, (int) player.getWorld().getId(), name);
     	else
-    		player.sendMessage( ChatColor.RED + "Error: Feature not implemented" );
+    		player.sendMessage(ChatColor.RED + "Error: Feature not implemented");
     	
     	places.getPlaces().add(mark);
         places.updateData();
-    	player.sendMessage( ChatColor.BLUE + "marked " + mark.toString() );
+    	player.sendMessage(ChatColor.BLUE + "marked " + mark.toString());
     	
-    	for ( Player p : getServer().getOnlinePlayers() )
-    		updateCurrent( p );
+    	for (Player p : getServer().getOnlinePlayers())
+    		updateCurrent(p);
     }
     
-    public void unmarkPlace( Player player )
+    public void unmarkPlace(Player player)
     {
-    	if ( config.opsOnly() && !player.isOp() ) {
-    		player.sendMessage( ChatColor.RED + "ops only!" );
+    	if (config.opsOnly() && !player.isOp()) {
+    		player.sendMessage(ChatColor.RED + "ops only!");
     		return;
     	}
     	
-    	Place nearest = nearestPlace( player );
+    	Place nearest = nearestPlace(player);
     	
-    	if ( nearest == null ) {
-    		player.sendMessage( ChatColor.RED + "Nothing to unmark!" );
+    	if (nearest == null) {
+    		player.sendMessage(ChatColor.RED + "Nothing to unmark!");
     		return;
     	}
     	
-    	places.getPlaces().remove( nearest );
+    	places.getPlaces().remove(nearest);
     	places.updateData();
-    	player.sendMessage( ChatColor.RED + "Unmarked " + nearest.toString() );
+    	player.sendMessage(ChatColor.RED + "Unmarked " + nearest.toString());
     	
-    	for ( Player p : getServer().getOnlinePlayers() )
-    		updateCurrent( p );
+    	for (Player p : getServer().getOnlinePlayers())
+    		updateCurrent(p);
     }
     
     

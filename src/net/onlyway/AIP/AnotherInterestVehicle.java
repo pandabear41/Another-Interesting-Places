@@ -8,16 +8,16 @@ public class AnotherInterestVehicle extends VehicleListener {
 
     private final AnotherInterest plugin;
 
-    public AnotherInterestVehicle( final AnotherInterest plugin )
+    public AnotherInterestVehicle(final AnotherInterest plugin)
     {
         this.plugin = plugin;
     }
     
     @Override
-    public void onVehicleMove( VehicleMoveEvent event )
+    public void onVehicleMove(VehicleMoveEvent event)
     {
-    	if ( event.getVehicle().getPassenger() instanceof Player )
-    		plugin.updateCurrent( ( Player )event.getVehicle().getPassenger() );
+    	if (event.getVehicle().getPassenger() instanceof Player)
+    		plugin.updateCurrent((Player)event.getVehicle().getPassenger());
     }
     
 }
