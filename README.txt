@@ -12,6 +12,10 @@ To use, type "/aip mark", "/aip unmark", "/aip nearest", or "/aip who" in chat
 to use the marking feature.
 
 
+To build this plugin from source, you'll need OLib, found at
+http://github.com/Nayruden/olib
+
+
 --COMMAND SYNTAX--
 
 *******************************************************************************
