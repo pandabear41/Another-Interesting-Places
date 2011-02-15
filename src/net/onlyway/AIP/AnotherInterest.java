@@ -91,7 +91,13 @@ public class AnotherInterest extends JavaPlugin {
                     return false;
                 }
                 markPlace(player, name, r);
+            } else if ( args[0].equalsIgnoreCase("unmark") ) {
+                unmarkPlace(player);
+            } else if  ( args[0].equalsIgnoreCase("nearest") ) {
+                sendNearest(player);
             }
+
+
         }
         return true;
 
@@ -118,42 +124,24 @@ public class AnotherInterest extends JavaPlugin {
     {
     	return config;
     }
-    
-    public static String safeMessage( String message )
-    {
-    	String r = message;
-    	boolean b = true;
-    	while ( b ) {
-    		b = false;
-	    	while ( r.length() >= 2 && r.charAt( r.length() - 2 ) == '§' ) {
-	    		r = r.substring( 0, r.length() - 2 );
-	    		b = true;
-	    	}
-	    	while ( r.length() >= 1 && r.charAt( r.length() - 1 ) == '§' ) {
-	    		r = r.substring( 0, r.length() - 1 );
-	    		b = true;
-	    	}
-    	}
-    	return r;
-    }
 
     private Place nearestPlace( Player player )
     {
     	if ( places == null )
     		return null;
-    	return places.getNearest( player.getLocation() );
+    	return places.getNearest( player.getLocation(), (int) player.getWorld().getId() );
     }
 
     private Place nearestPlaceInRange( Player player )
     {
     	if ( places == null )
     		return null;
-    	return places.getNearestRadius( player.getLocation() );
+    	return places.getNearestRadius( player.getLocation(), (int) player.getWorld().getId());
     }
 
     public void updateCurrent( Player player )
     {
-    	if ( times.containsKey( player ) && System.currentTimeMillis() - times.get( player ) < 8000 )
+    	if ( times.containsKey( player ) && System.currentTimeMillis() - times.get( player ) < 1000 )
     		return;
     	
     	Place place = nearestPlaceInRange( player );
@@ -169,9 +157,8 @@ public class AnotherInterest extends JavaPlugin {
             } else {
                 player.sendMessage( config.entering( place.getName()));
             }
-            times.put( player, System.currentTimeMillis() );
         }
-		
+	times.put( player, System.currentTimeMillis() );
         current.put( player, place );
     }
     
@@ -213,7 +200,7 @@ public class AnotherInterest extends JavaPlugin {
     		}
     	}
     	if ( !b ) {
-    		player.sendMessage( "§fplayer not found!" );
+    		player.sendMessage( ChatColor.RED + "Player not found!" );
     	}
     }
     
@@ -249,7 +236,7 @@ public class AnotherInterest extends JavaPlugin {
     	else
     		player.sendMessage( ChatColor.RED + "Error: Feature not implemented" );
     	
-    	places.addPlace(mark);
+    	places.getPlaces().add(mark);
         places.updateData();
     	player.sendMessage( ChatColor.BLUE + "marked " + mark.toString() );
     	
@@ -260,20 +247,20 @@ public class AnotherInterest extends JavaPlugin {
     public void unmarkPlace( Player player )
     {
     	if ( config.opsOnly() && !player.isOp() ) {
-    		player.sendMessage( "§fops only!" );
+    		player.sendMessage( ChatColor.RED + "ops only!" );
     		return;
     	}
     	
     	Place nearest = nearestPlace( player );
     	
     	if ( nearest == null ) {
-    		player.sendMessage( "§fnothing to unmark!" );
+    		player.sendMessage( ChatColor.RED + "Nothing to unmark!" );
     		return;
     	}
     	
     	places.getPlaces().remove( nearest );
     	places.updateData();
-    	player.sendMessage( "§funmarked " + nearest.toString() );
+    	player.sendMessage( ChatColor.RED + "Unmarked " + nearest.toString() );
     	
     	for ( Player p : getServer().getOnlinePlayers() )
     		updateCurrent( p );

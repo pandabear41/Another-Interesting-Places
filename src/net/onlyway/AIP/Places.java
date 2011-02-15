@@ -6,7 +6,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -15,7 +15,7 @@ import org.bukkit.Location;
 public class Places {
 
     private final AnotherInterest plugin;
-    private HashMap<String,Place> places = new HashMap<String,Place>();
+    private ArrayList<Place> places = new ArrayList<Place>();
 
     public Places( final AnotherInterest plugin )
     {
@@ -30,7 +30,7 @@ public class Places {
                     while ((obj = oin.readObject()) != null) {
                         if (obj instanceof Place) {
                             Place plac = (Place) obj;
-                            places.put( plac.getName(),plac);
+                            places.add(plac);
                         }
                     }
                 } catch (ClassNotFoundException ex) {
@@ -41,30 +41,23 @@ public class Places {
             }
     }
 
-    public Set getPlaces()
+    public ArrayList<Place> getPlaces()
     {
-            return places.entrySet();
+            return places;
     }
-
-    public void addPlace(Place plac) {
-        places.put(plac.getName(), plac);
-    }
-
-    public Place getNearestRadius(Location loc) {
-        Iterator placs = places.entrySet().iterator();
+    
+    public Place getNearestRadius(Location loc, int world) {
+        Iterator placs = places.iterator();
 
         //Lazy mode activated.
         Place nearest = null;
         Place current = null;
-        Entry entry = null;
         if (placs.hasNext()) {
-            entry = (Entry) placs.next();
-            nearest = (Place) entry.getValue();
+            nearest = (Place) placs.next();
         }
         while(placs.hasNext()) {
-            entry = (Entry) placs.next();
-            current = (Place) entry.getValue();
-            if (nearest.distance(loc) > current.distance(loc) && current.inRange(loc)) {
+            current = (Place) placs.next();
+            if (nearest.distance(loc) > current.distance(loc) && current.inRange(loc) && current.getWorld() == world) {
                 nearest = current;
             }
         }
@@ -72,31 +65,29 @@ public class Places {
         if (nearest == null)
             return null;
         else 
-            return nearest.inRange(loc) ? nearest : null ;
+            return (nearest.inRange(loc) && current.getWorld() == world) ? nearest : null ;
 
     }
 
-    public Place getNearest(Location loc) {
-        Iterator placs = places.entrySet().iterator();
+    public Place getNearest(Location loc, int world) {
+        Iterator placs = places.iterator();
 
         //Lazy mode activated.
         Place nearest = null;
         Place current = null;
-        Entry entry = null;
         if (placs.hasNext()) {
-            entry = (Entry) placs.next();
-            nearest = (Place) entry.getValue();
+            nearest = (Place) placs.next();
         }
         while(placs.hasNext()) {
-            entry = (Entry) placs.next();
-            current = (Place) entry.getValue();
-            if (nearest.distance(loc) > current.distance(loc)) {
+            current = (Place) placs.next();
+            if (nearest.distance(loc) > current.distance(loc) && current.getWorld() == world) {
                 nearest = current;
             }
         }
-
-        return nearest;
-
+        if (nearest == null)
+            return null;
+        else
+            return  current.getWorld() == world ? nearest : null ;
     }
 
     void updateData()
@@ -107,11 +98,8 @@ public class Places {
             FileOutputStream writer = new FileOutputStream(plugin.getDataFolder() + File.separator + AnotherInterest.DATA_FILE);
 
             ObjectOutputStream oout = new ObjectOutputStream (writer);
-            Iterator placs = places.entrySet().iterator();
-            Entry entry = null;
-            while(placs.hasNext()) {
-                entry = (Entry) placs.next();
-                oout.writeObject((Place) entry.getValue());
+            for ( Place p : places ) {
+                oout.writeObject(p);
             }
             writer.close();
         }
