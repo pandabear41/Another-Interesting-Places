@@ -16,10 +16,12 @@ public class Place implements Serializable {
     //private int yDist;
     //private int zDist;
     private int world;
+    private int depth;
     private String name;
 
     public Place(Location loc, int radius, int world, String name)
     {
+            depth = -1;
             x = loc.getBlockX();
             y = loc.getBlockY();
             z = loc.getBlockZ();
@@ -32,14 +34,19 @@ public class Place implements Serializable {
     {
             double r = 0;
             r += Math.pow( x - loc.getBlockX(), 2);
-            r += Math.pow( y - loc.getBlockY(), 2);
+            r += (depth == -1) ? (Math.pow( y - loc.getBlockY(), 2)) : 0; // If there is a depth we want to calculate it seperately.
             r += Math.pow( z - loc.getBlockZ(), 2);
             return Math.sqrt(r);
     }
 
+
+
     public boolean inRange(Location loc)
     {
-        return distance(loc) <= radius;
+        if (depth == -1)
+            return (distance(loc) <= radius);
+        else
+            return (distance(loc) <= radius) && ((y - depth) < loc.getBlockY() && (y + depth) > loc.getBlockY());
     }
 
     public int getX()
@@ -75,6 +82,14 @@ public class Place implements Serializable {
     public String getName()
     {
             return name;
+    }
+
+    public void setDepth(int depth) {
+        this.depth = depth;
+    }
+
+    public int getDepth() {
+        return depth;
     }
 
     @Override

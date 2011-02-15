@@ -17,7 +17,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 public class AnotherInterest extends JavaPlugin {
 	
-    public static final String DATA_FILE = "places.txt";
+    public static final String DATA_FILE = "places.dat";
     public static final String CONFIG_FILE = "config.txt";
 
     private final AnotherInterestPlayer player = new AnotherInterestPlayer(this);
@@ -72,6 +72,7 @@ public class AnotherInterest extends JavaPlugin {
            
             if (args[0].equalsIgnoreCase("mark")) {
                 int r = -1;
+                int d = -1;
                 String[] sstring = arrayToString(args, " ", 1).split(":");
                 if (sstring.length < 2) {
                     player.sendMessage(ChatColor.RED + "Invalid Command Syntax!");
@@ -81,15 +82,27 @@ public class AnotherInterest extends JavaPlugin {
 
                 String name = sstring[0];
                 String lprms = sstring[1];
-
-                try {
-                    r=Integer.parseInt(lprms);
-                } catch ( NumberFormatException e ) {
-                    player.sendMessage(ChatColor.RED + "Error in radius entry!");
-                    player.sendMessage(ChatColor.RED + "USE /aip mark [Name]:[Radius]");
-                    return false;
+                String[] parms = lprms.split(",");
+                if (parms.length == 1) {  //Only Radius entered.
+                    try {
+                        r=Integer.parseInt(parms[0]);
+                    } catch ( NumberFormatException e ) {
+                        player.sendMessage(ChatColor.RED + "Error in radius entry!");
+                        player.sendMessage(ChatColor.RED + "USE /aip mark [Name]:[Radius]");
+                        return false;
+                    }
+                } else if (parms.length == 2) { //Radius and depth entered.
+                    try {
+                        r=Integer.parseInt(parms[0]);
+                        d=Integer.parseInt(parms[1]);
+                    } catch ( NumberFormatException e ) {
+                        player.sendMessage(ChatColor.RED + "Error in data entry!");
+                        player.sendMessage(ChatColor.RED + "USE /aip mark [Name]:[Radius],[Depth Radius]");
+                        return false;
+                    }
                 }
-                markPlace(player, name, r);
+
+                markPlace(player, name, r, d);
             } else if (args[0].equalsIgnoreCase("unmark")) {
                 unmarkPlace(player);
             } else if (args[0].equalsIgnoreCase("nearest")) {
@@ -140,7 +153,8 @@ public class AnotherInterest extends JavaPlugin {
     		return;
     	
     	Place place = nearestPlaceInRange(player);
-        if (place != null) player.sendMessage(ChatColor.WHITE + "Distance from:" + place.distance(player.getLocation()));
+        //if (place != null) player.sendMessage(ChatColor.WHITE + "Distance from:" + place.distance(player.getLocation()));
+        if (place != null) player.sendMessage(ChatColor.WHITE + "Distance from:" + place.distance(player.getLocation()) + ". Y Axis:" + player.getLocation().getY() + ". Delta y:" + place.getDepth() );
         Place old = null;
         if (current.containsKey(player))
             old = current.get(player);
@@ -163,41 +177,41 @@ public class AnotherInterest extends JavaPlugin {
     	times.remove(player);
     }
     
-    public void sendWho(Player player)
-    {
-    	Player[] players = getServer().getOnlinePlayers();
-    	player.sendMessage(config.whoHead(Integer.toString(players.length)));
-    	for (Player p : players) {
-            Place place = nearestPlace(p);
-
-            if (place == null)
-                player.sendMessage(config.whoLineNoPlace(p.getName()));
-            else
-                player.sendMessage(config.whoLinePlace(p.getName(), place.getName()));
-    	}
-    }
-    
-    public void sendWho(Player player, String who)
-    {
-    	boolean b = false;
-    	Player[] players = getServer().getOnlinePlayers();
-    	for (Player p : players) {
-            if (p.getName().equalsIgnoreCase(who)) {
-                Location loc = p.getLocation();
-                Place place = nearestPlace(p);
-
-                if (place == null)
-                    player.sendMessage(config.whoLineNoPlace(p.getName()));
-                else
-                    player.sendMessage(config.whoLinePlace(p.getName(), place.getName()));
-                player.sendMessage("§f[" + Integer.toString( loc.getBlockX() ) + ", " + Integer.toString( loc.getBlockY() ) + ", " + Integer.toString( loc.getBlockZ() ) + "]");
-                b = true;
-            }
-    	}
-    	if (!b) {
-    		player.sendMessage(ChatColor.RED + "Player not found!");
-    	}
-    }
+//    public void sendWho(Player player)
+//    {
+//    	Player[] players = getServer().getOnlinePlayers();
+//    	player.sendMessage(config.whoHead(Integer.toString(players.length)));
+//    	for (Player p : players) {
+//            Place place = nearestPlace(p);
+//
+//            if (place == null)
+//                player.sendMessage(config.whoLineNoPlace(p.getName()));
+//            else
+//                player.sendMessage(config.whoLinePlace(p.getName(), place.getName()));
+//    	}
+//    }
+//
+//    public void sendWho(Player player, String who)
+//    {
+//    	boolean b = false;
+//    	Player[] players = getServer().getOnlinePlayers();
+//    	for (Player p : players) {
+//            if (p.getName().equalsIgnoreCase(who)) {
+//                Location loc = p.getLocation();
+//                Place place = nearestPlace(p);
+//
+//                if (place == null)
+//                    player.sendMessage(config.whoLineNoPlace(p.getName()));
+//                else
+//                    player.sendMessage(config.whoLinePlace(p.getName(), place.getName()));
+//                player.sendMessage("§f[" + Integer.toString( loc.getBlockX() ) + ", " + Integer.toString( loc.getBlockY() ) + ", " + Integer.toString( loc.getBlockZ() ) + "]");
+//                b = true;
+//            }
+//    	}
+//    	if (!b) {
+//    		player.sendMessage(ChatColor.RED + "Player not found!");
+//    	}
+//    }
     
     public void sendNearest(Player player)
     {
@@ -205,8 +219,14 @@ public class AnotherInterest extends JavaPlugin {
     	if (nearest != null)
     		player.sendMessage(nearest.toString());
     }
-    
+
+
     public void markPlace(Player player, String name, int radius)
+    {
+         markPlace(player, name, radius, -1);
+    }
+
+    public void markPlace(Player player, String name, int radius, int depth)
     {
     	if (config.opsOnly() && !player.isOp()) {
     		player.sendMessage(ChatColor.RED + "ops only!");
@@ -230,7 +250,8 @@ public class AnotherInterest extends JavaPlugin {
     		mark = new Place(player.getLocation(), radius, (int) player.getWorld().getId(), name);
     	else
     		player.sendMessage(ChatColor.RED + "Error: Feature not implemented");
-    	
+        mark.setDepth(depth);
+        
     	places.getPlaces().add(mark);
         places.updateData();
     	player.sendMessage(ChatColor.BLUE + "marked " + mark.toString());

@@ -16,12 +16,9 @@ to use the marking feature.
 
 *******************************************************************************
 COMMAND:
-/aip mark [Name]
-<Makes the point the default radius>
-or
 /aip mark [Name]:[Radius]
 or
-/aip mark [Name]:[X],[Y],[Z]
+/aip mark [Name]:[Radius],[Y Radius]
 
 DESCRIPTION:
 Mark sets a point and radius on the map that other players will see.
@@ -40,6 +37,7 @@ Nearest displays the nerest point to the player and the coordinates of the
 marked point.
 *******************************************************************************
 COMMAND:
+<NOT IMPLEMENTED>
 /aip who
 or 
 /aip who [Name]
@@ -47,6 +45,25 @@ or
 DESCRIPTION:
 Who displays the logged in players and the zones that they are in.
 *******************************************************************************
+-- TODO --
+Add
+/aip mark [Name]
+<Makes the point the default radius>
+
+Add 
+/aip mark [Name]:[X],[Y],[Z],[Dx],[Dy],[Dz]
+
+Add
+/aip mark [Name]:[Radius],[Y Start],[Y End]
+
+Add 
+/aip who
+or 
+/aip who [Name]
+
+
+
+
 
 -- CHANGELOG --
 

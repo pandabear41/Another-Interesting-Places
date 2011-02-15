@@ -52,6 +52,7 @@ public class Places {
         Place current = null;
         if (placs.hasNext()) {
             nearest = (Place) placs.next();
+
         }
         while(placs.hasNext()) {
             current = (Place) placs.next();
@@ -60,10 +61,10 @@ public class Places {
             }
         }
 
-        if (nearest == null)
+        if (nearest == null )
             return null;
         else 
-            return (nearest.inRange(loc) && current.getWorld() == world) ? nearest : null ;
+            return (nearest.inRange(loc) && nearest.getWorld() == world) ? nearest : null ;
 
     }
 
@@ -85,7 +86,7 @@ public class Places {
         if (nearest == null)
             return null;
         else
-            return  current.getWorld() == world ? nearest : null ;
+            return (nearest.getWorld() == world) ? nearest : null ;
     }
 
     void updateData()
