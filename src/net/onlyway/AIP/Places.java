@@ -92,7 +92,6 @@ public class Places {
     void updateData()
     {
         try {
-            plugin.getDataFolder().mkdir();
             FileOutputStream writer = new FileOutputStream(plugin.getDataFolder() + File.separator + AnotherInterest.DATA_FILE);
 
             ObjectOutputStream oout = new ObjectOutputStream (writer);

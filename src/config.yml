@@ -4,7 +4,8 @@ entered-zone-text: "entering"
 no-zone-text: "entering wilderness"
 # Will the zone left be displayed when leaving a zone.
 no-zone-name: false
-
+# Debug the plugin?
+debug: true
 #    private String whoHead	       = "§e$1 player(s) online:";
 #private String whoLinePlace    = "§e+ §f$1 §e- §f$2";
 #    private String whoLineNoPlace  = "§e+ §f$1 §e- §fwilderness";

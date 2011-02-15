@@ -39,6 +39,8 @@ public class AnotherInterest extends JavaPlugin {
     public void onEnable()
     {
         PluginManager pm = getServer().getPluginManager();
+        PluginDescriptionFile pdfFile = this.getDescription();
+
         pm.registerEvent(Event.Type.PLAYER_JOIN,    player,  Priority.Monitor, this);
         pm.registerEvent(Event.Type.PLAYER_QUIT,    player,  Priority.Monitor, this);
         pm.registerEvent(Event.Type.PLAYER_MOVE,    player,  Priority.Normal, this);
@@ -49,9 +51,10 @@ public class AnotherInterest extends JavaPlugin {
         File config_file = new File(getDataFolder(), "config.yml");
         if (!config_file.isFile()) {
             Util.extractResourceTo("/config.yml", config_file.getPath());
+            System.out.println("A default config file was created for " + pdfFile + ". Please restart the server to ensure that the config is loaded.");
         }
 
-        PluginDescriptionFile pdfFile = this.getDescription();
+        
         System.out.println(pdfFile.getName() + " version " + pdfFile.getVersion() + " has been loaded.");
     }
 
@@ -73,7 +76,7 @@ public class AnotherInterest extends JavaPlugin {
             if (args.length < 1 || !((args[0].equalsIgnoreCase("mark") && args.length > 1) || args[0].equalsIgnoreCase("unmark") || args[0].equalsIgnoreCase("nearest") || args[0].equalsIgnoreCase("who"))) {
                 player.sendMessage(ChatColor.RED + "/aip <unmark,nearest,who>");
                 player.sendMessage(ChatColor.RED + "OR /aip mark [Name]:[Radius]");
-                //player.sendMessage(ChatColor.RED + "OR /aip mark [Name]:[Radius],[Height]");
+                player.sendMessage(ChatColor.RED + "OR /aip mark [Name]:[Radius],[Y Radius]");
                 player.sendMessage(ChatColor.RED + "OR /aip who [Player Name]");
                 player.sendMessage(ChatColor.RED + "mark - Mark a position on the map with a name.");
                 player.sendMessage(ChatColor.RED + "unmark - Unmark the nearest marked position");
@@ -104,14 +107,19 @@ public class AnotherInterest extends JavaPlugin {
                         return false;
                     }
                 } else if (parms.length == 2) { //Radius and depth entered.
-                    try {
-                        r=Integer.parseInt(parms[0]);
-                        d=Integer.parseInt(parms[1]);
-                    } catch ( NumberFormatException e ) {
-                        player.sendMessage(ChatColor.RED + "Error in data entry!");
-                        player.sendMessage(ChatColor.RED + "USE /aip mark [Name]:[Radius],[Depth Radius]");
-                        return false;
+                    if (parms[1].contains("-")) {
+
+                    } else {
+                        try {
+                            r=Integer.parseInt(parms[0]);
+                            d=Integer.parseInt(parms[1]);
+                        } catch ( NumberFormatException e ) {
+                            player.sendMessage(ChatColor.RED + "Error in data entry!");
+                            player.sendMessage(ChatColor.RED + "USE /aip mark [Name]:[Radius],[Y Radius]");
+                            return false;
+                        }
                     }
+
                 }
 
                 markPlace(player, name, r, d);
@@ -159,8 +167,7 @@ public class AnotherInterest extends JavaPlugin {
     		return;
     	
     	Place place = nearestPlaceInRange(player);
-        //if (place != null) player.sendMessage(ChatColor.WHITE + "Distance from:" + place.distance(player.getLocation()));
-        if (place != null) player.sendMessage(ChatColor.WHITE + "Distance from:" + place.distance(player.getLocation()) + ". Y Axis:" + player.getLocation().getY() + ". Delta y:" + place.getDepth() );
+        if (place != null && getConfiguration().getBoolean("debug",false)) player.sendMessage(ChatColor.WHITE + "Distance from:" + place.distance(player.getLocation()) + ". Y Axis:" + player.getLocation().getY() );
         Place old = null;
         if (current.containsKey(player))
             old = current.get(player);
@@ -258,7 +265,7 @@ public class AnotherInterest extends JavaPlugin {
     		mark = new Place(player.getLocation(), radius, (int) player.getWorld().getId(), name, player.getDisplayName());
     	else
     		player.sendMessage(ChatColor.RED + "Error: Feature not implemented");
-        mark.setDepth(depth);
+        mark.setYDist(depth);
         
     	places.getPlaces().add(mark);
         places.updateData();
