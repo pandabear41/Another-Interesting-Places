@@ -2,6 +2,7 @@ package net.onlyway.AIP;
 
 import java.io.File;
 import java.util.HashMap;
+import net.omnivr.olib.Util;
 import org.bukkit.ChatColor;
 
 import org.bukkit.Location;
@@ -13,6 +14,7 @@ import org.bukkit.event.Event.Priority;
 import org.bukkit.event.Event;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.PluginLoader;
+import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class AnotherInterest extends JavaPlugin {
@@ -23,7 +25,6 @@ public class AnotherInterest extends JavaPlugin {
     private final AnotherInterestPlayer player = new AnotherInterestPlayer(this);
     private final AnotherInterestVehicle vehicle = new AnotherInterestVehicle(this);
     private final Places places = new Places(this);
-    private final Config config = new Config(this);
     
     private HashMap<Player,Place> current = new HashMap<Player,Place>();
     private HashMap<Player,Long> times = new HashMap<Player,Long>();
@@ -37,10 +38,21 @@ public class AnotherInterest extends JavaPlugin {
     @Override
     public void onEnable()
     {
-        getServer().getPluginManager().registerEvent(Event.Type.PLAYER_JOIN,    player,  Priority.Normal, this);
-        getServer().getPluginManager().registerEvent(Event.Type.PLAYER_QUIT,    player,  Priority.Normal, this);
-        getServer().getPluginManager().registerEvent(Event.Type.PLAYER_MOVE,    player,  Priority.Normal, this);
-        getServer().getPluginManager().registerEvent(Event.Type.VEHICLE_MOVE,   vehicle, Priority.Normal, this);
+        PluginManager pm = getServer().getPluginManager();
+        pm.registerEvent(Event.Type.PLAYER_JOIN,    player,  Priority.Monitor, this);
+        pm.registerEvent(Event.Type.PLAYER_QUIT,    player,  Priority.Monitor, this);
+        pm.registerEvent(Event.Type.PLAYER_MOVE,    player,  Priority.Normal, this);
+        pm.registerEvent(Event.Type.VEHICLE_MOVE,   vehicle, Priority.Normal, this);
+
+        // Thanks Zoot. 
+        getDataFolder().mkdirs(); // Make sure dir exists
+        File config_file = new File(getDataFolder(), "config.yml");
+        if (!config_file.isFile()) {
+            Util.extractResourceTo("/config.yml", config_file.getPath());
+        }
+
+        PluginDescriptionFile pdfFile = this.getDescription();
+        System.out.println(pdfFile.getName() + " version " + pdfFile.getVersion() + " has been loaded.");
     }
 
     @Override
@@ -127,12 +139,6 @@ public class AnotherInterest extends JavaPlugin {
         return result.toString();
     }
 
-    
-    public Config getConfig()
-    {
-    	return config;
-    }
-
     private Place nearestPlace(Player player)
     {
     	if (places == null)
@@ -161,10 +167,12 @@ public class AnotherInterest extends JavaPlugin {
 
         if ((place != old || !current.containsKey(player)) && !(old != null && place != null && old.getName().equals(place.getName()))) {
             if ( place == null ) {
-                if ( old != null || !config.leavingUsesArg() )
-                    player.sendMessage(config.leaving( old != null ? old.getName() : "" ));
+                if ( old != null && getConfiguration().getBoolean("no-zone-name", false))
+                    player.sendMessage(ChatColor.DARK_AQUA + getConfiguration().getString("no-zone-text") + ChatColor.WHITE + old.getName());
+                else
+                    player.sendMessage(ChatColor.DARK_AQUA + getConfiguration().getString("no-zone-text"));
             } else {
-                player.sendMessage(config.entering( place.getName()));
+                player.sendMessage(ChatColor.DARK_AQUA + getConfiguration().getString("entered-zone-text") + ChatColor.WHITE + " " + place.getName());
             }
         }
 	times.put(player, System.currentTimeMillis());
@@ -228,10 +236,10 @@ public class AnotherInterest extends JavaPlugin {
 
     public void markPlace(Player player, String name, int radius, int depth)
     {
-    	if (config.opsOnly() && !player.isOp()) {
-    		player.sendMessage(ChatColor.RED + "ops only!");
-    		return;
-    	}
+//    	if (config.opsOnly() && !player.isOp()) {
+//    		player.sendMessage(ChatColor.RED + "ops only!");
+//    		return;
+//    	}
     	
     	Place nearest = nearestPlace(player);
     	
@@ -247,7 +255,7 @@ public class AnotherInterest extends JavaPlugin {
     	
     	Place mark = null;
     	if ( radius > 0 )
-    		mark = new Place(player.getLocation(), radius, (int) player.getWorld().getId(), name);
+    		mark = new Place(player.getLocation(), radius, (int) player.getWorld().getId(), name, player.getDisplayName());
     	else
     		player.sendMessage(ChatColor.RED + "Error: Feature not implemented");
         mark.setDepth(depth);
@@ -262,24 +270,25 @@ public class AnotherInterest extends JavaPlugin {
     
     public void unmarkPlace(Player player)
     {
-    	if (config.opsOnly() && !player.isOp()) {
-    		player.sendMessage(ChatColor.RED + "ops only!");
-    		return;
-    	}
+//    	if (config.opsOnly() && !player.isOp()) {
+//    		player.sendMessage(ChatColor.RED + "ops only!");
+//    		return;
+//    	}
+
     	
     	Place nearest = nearestPlace(player);
-    	
-    	if (nearest == null) {
+        if (nearest == null) {
     		player.sendMessage(ChatColor.RED + "Nothing to unmark!");
     		return;
     	}
-    	
-    	places.getPlaces().remove(nearest);
-    	places.updateData();
-    	player.sendMessage(ChatColor.RED + "Unmarked " + nearest.toString());
-    	
-    	for (Player p : getServer().getOnlinePlayers())
-    		updateCurrent(p);
+    	if (player.isOp() || player.getDisplayName().equals(nearest.getOwner())) {
+            places.getPlaces().remove(nearest);
+            places.updateData();
+            player.sendMessage(ChatColor.RED + "Unmarked " + nearest.toString());
+
+            for (Player p : getServer().getOnlinePlayers())
+                    updateCurrent(p);
+        }
     }
     
     

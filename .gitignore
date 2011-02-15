@@ -1,5 +1,7 @@
 build/
 dist/
 nbproject/
+src/items.db
+src/net/
 build-impl.xml
 manifest.mf

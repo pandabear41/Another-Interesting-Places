@@ -1,0 +1,10 @@
+# The text to display when a player enters a zone.
+entered-zone-text: "entering"
+# The text to display when a player is in no zone.
+no-zone-text: "entering wilderness"
+# Will the zone left be displayed when leaving a zone.
+no-zone-name: false
+
+#    private String whoHead	       = "§e$1 player(s) online:";
+#private String whoLinePlace    = "§e+ §f$1 §e- §f$2";
+#    private String whoLineNoPlace  = "§e+ §f$1 §e- §fwilderness";

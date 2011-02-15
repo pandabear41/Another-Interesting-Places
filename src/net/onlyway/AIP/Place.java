@@ -18,8 +18,9 @@ public class Place implements Serializable {
     private int world;
     private int depth;
     private String name;
+    private String ownername;
 
-    public Place(Location loc, int radius, int world, String name)
+    public Place(Location loc, int radius, int world, String name, String ownername)
     {
             depth = -1;
             x = loc.getBlockX();
@@ -28,6 +29,7 @@ public class Place implements Serializable {
             this.radius = radius;
             this.name = name;
             this.world = world;
+            this.ownername = ownername;
     }
 
     public double distance(Location loc)
@@ -90,6 +92,10 @@ public class Place implements Serializable {
 
     public int getDepth() {
         return depth;
+    }
+
+    public String getOwner() {
+        return ownername;
     }
 
     @Override
