@@ -10,7 +10,11 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import org.bukkit.Location;
+import org.bukkit.World;
+import org.bukkit.Server;
+import org.bukkit.World.Environment;
 
 public class Places {
 
@@ -35,12 +39,77 @@ public class Places {
                 }
             } catch (ClassNotFoundException ex) {
             }
-
-
         } catch (IOException e) {
         }
     }
 
+    public boolean convertOld(String filename, Server server) {
+        File old_file = new File(plugin.getDataFolder(), filename);
+        if (!old_file.isFile()) {
+            return false;
+        }
+        try {
+            BufferedReader reader = new BufferedReader( new FileReader( plugin.getDataFolder() + File.separator + filename ) );
+            boolean b = true;
+            boolean v1_1 = false;
+            String s = reader.readLine();
+            if ( s.equals( "version1.1" ) ) {
+                v1_1 = true;
+                s = reader.readLine();
+            }
+            while ( b ) {
+                try {
+                    addOld( s, v1_1, server );
+                }
+                catch ( Exception e ) {
+                }
+                s = reader.readLine();
+                b = s != null;
+            }
+            reader.close();
+        }
+        catch ( IOException e ) {
+        }
+        old_file.delete();
+        return true;
+    }
+
+    public void addOld(String s, boolean v1_1, Server server) {
+        Place myPlace = null;
+        Location loc;
+        World world;
+
+        List<World> worlds = server.getWorlds();
+        world = server.getWorlds().get(0);
+        for (int i = 0; i < worlds.size(); i++)
+        {
+            world = server.getWorlds().get(i);
+            if (world.getEnvironment() == Environment.NORMAL) break;
+        }
+
+
+        if ( v1_1 ) {
+            String[] xyz = s.split( " ", 2 );
+            if ( xyz[ 0 ].equalsIgnoreCase( "xyz" ) ) {
+                String[] args = xyz[ 1 ].split( " ", 7 );
+                loc =  new Location(world, Integer.parseInt(args[0]), Integer.parseInt(args[1]), Integer.parseInt(args[2]));
+                myPlace = new Place(loc, Integer.parseInt(args[3]), Integer.parseInt(args[4]), Integer.parseInt(args[5]), (int) world.getId(), args[6].replaceAll( "##", "§" ), "[none]");
+            } else {
+                String[] args = s.split( " ", 5 );
+                loc =  new Location(world, Integer.parseInt(args[0]), Integer.parseInt(args[1]), Integer.parseInt(args[2]));
+                myPlace = new Place(loc, Integer.parseInt(args[3]), -1, (int) world.getId(), args[4].replaceAll( "##", "§" ), "[none]");
+            }
+        } else {
+            String[] args = s.split( " ", 4 );
+// TODO: Add a place with default radius.
+//            x = Integer.parseInt( args[ 0 ] );
+//            y = Integer.parseInt( args[ 1 ] );
+//            z = Integer.parseInt( args[ 2 ] );
+//            name = args[ 3 ].replaceAll( "##", "§" );
+        }
+        places.add(myPlace);
+
+    }
 
     public ArrayList<Place> getPlaces()
     {

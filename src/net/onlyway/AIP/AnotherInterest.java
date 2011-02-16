@@ -33,6 +33,9 @@ public class AnotherInterest extends JavaPlugin {
     {
         super( loader, server, pdf, dir, plugin, classLoader );
     	places.updateData();
+        if (places.convertOld("places.txt", server))
+            System.out.println("An old interesting places file was loaded.");
+
     }
 
     @Override
@@ -53,11 +56,7 @@ public class AnotherInterest extends JavaPlugin {
             extractResourceTo("/config.yml", config_file.getPath());
             System.out.println("A default config file was created for " + pdfFile + ". Please restart the server to ensure that the config is loaded.");
         }
-
-
         System.out.println(pdfFile.getName() + " version " + pdfFile.getVersion() + " has been loaded.");
-
-
     }
 
     /**
