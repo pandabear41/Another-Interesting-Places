@@ -1,10 +1,11 @@
 package net.onlyway.AIP;
 
 import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.HashMap;
-import net.omnivr.olib.Util;
 import org.bukkit.ChatColor;
-
 import org.bukkit.Location;
 import org.bukkit.Server;
 import org.bukkit.command.Command;
@@ -20,7 +21,6 @@ import org.bukkit.plugin.java.JavaPlugin;
 public class AnotherInterest extends JavaPlugin {
 	
     public static final String DATA_FILE = "places.dat";
-    public static final String CONFIG_FILE = "config.txt";
 
     private final AnotherInterestPlayer player = new AnotherInterestPlayer(this);
     private final AnotherInterestVehicle vehicle = new AnotherInterestVehicle(this);
@@ -50,12 +50,46 @@ public class AnotherInterest extends JavaPlugin {
         getDataFolder().mkdirs(); // Make sure dir exists
         File config_file = new File(getDataFolder(), "config.yml");
         if (!config_file.isFile()) {
-            Util.extractResourceTo("/config.yml", config_file.getPath());
+            extractResourceTo("/config.yml", config_file.getPath());
             System.out.println("A default config file was created for " + pdfFile + ". Please restart the server to ensure that the config is loaded.");
         }
 
-        
+
         System.out.println(pdfFile.getName() + " version " + pdfFile.getVersion() + " has been loaded.");
+
+
+    }
+
+    /**
+     *
+     * @author Zoot
+     */
+    public static void extractResourceTo(String resource, String path) {
+        FileWriter output;
+        try {
+            output = new FileWriter(path);
+        } catch (IOException ex) {
+            System.err.println("Error: Could not create file " + path);
+            return;
+        }
+
+        InputStream input = AnotherInterest.class.getResourceAsStream(resource);
+        try {
+            int c = input.read();
+            while (c > 0) {
+                output.write(c);
+                c = input.read();
+            }
+        } catch (IOException ex) {
+            System.err.println("Error while writing file: " + path);
+        } finally {
+            try {
+                output.close();
+                input.close();
+            } catch (IOException ex) {
+                // Just give up
+            }
+        }
     }
 
     @Override
@@ -86,8 +120,6 @@ public class AnotherInterest extends JavaPlugin {
             }
            
             if (args[0].equalsIgnoreCase("mark")) {
-                int r = -1;
-                int d = -1;
                 String[] sstring = arrayToString(args, " ", 1).split(":");
                 if (sstring.length < 2) {
                     player.sendMessage(ChatColor.RED + "Invalid Command Syntax!");
@@ -100,7 +132,7 @@ public class AnotherInterest extends JavaPlugin {
                 String[] parms = lprms.split(",");
                 if (parms.length == 1) {  //Only Radius entered.
                     try {
-                        r=Integer.parseInt(parms[0]);
+                        markPlace(player, name, Integer.parseInt(parms[0]), true);
                     } catch ( NumberFormatException e ) {
                         player.sendMessage(ChatColor.RED + "Error in radius entry!");
                         player.sendMessage(ChatColor.RED + "USE /aip mark [Name]:[Radius]");
@@ -108,11 +140,19 @@ public class AnotherInterest extends JavaPlugin {
                     }
                 } else if (parms.length == 2) { //Radius and depth entered.
                     if (parms[1].contains("-")) {
-
+                        String[] oparms = parms[1].split("-");
+                        if (oparms.length == 2) {
+                            try {
+                                 markPlace(player, name, Integer.parseInt(parms[0]), Integer.parseInt(oparms[0]), Integer.parseInt(oparms[1]));
+                            } catch ( NumberFormatException e ) {
+                                player.sendMessage(ChatColor.RED + "Error in data entry!");
+                                player.sendMessage(ChatColor.RED + "USE /aip mark [Name]:[Radius],[Y Start]-[Y End]");
+                                return false;
+                            }
+                        }
                     } else {
                         try {
-                            r=Integer.parseInt(parms[0]);
-                            d=Integer.parseInt(parms[1]);
+                             markPlace(player, name, Integer.parseInt(parms[0]), Integer.parseInt(parms[1]));
                         } catch ( NumberFormatException e ) {
                             player.sendMessage(ChatColor.RED + "Error in data entry!");
                             player.sendMessage(ChatColor.RED + "USE /aip mark [Name]:[Radius],[Y Radius]");
@@ -122,7 +162,7 @@ public class AnotherInterest extends JavaPlugin {
 
                 }
 
-                markPlace(player, name, r, d);
+                
             } else if (args[0].equalsIgnoreCase("unmark")) {
                 unmarkPlace(player);
             } else if (args[0].equalsIgnoreCase("nearest")) {
@@ -238,63 +278,83 @@ public class AnotherInterest extends JavaPlugin {
 
     public void markPlace(Player player, String name, int radius)
     {
-         markPlace(player, name, radius, -1);
+         markPlace(player, name, radius, true);
     }
 
-    public void markPlace(Player player, String name, int radius, int depth)
+    public void markPlace(Player player, String name, int radius, boolean ignoreY)
+    {
+        markPlace(player, player.getLocation(), name, radius, (ignoreY) ? -1 : radius, radius, radius);
+    }
+
+    public void markPlace(Player player, String name, int radius, int yRadius)
+    {
+        markPlace(player, player.getLocation(), name, radius, yRadius, radius, radius);
+    }
+
+    public void markPlace(Player player, String name, int radius, int y, int yRadius)
+    {
+        Location loc = player.getLocation();
+        loc.setY(y + Math.abs(y - yRadius)/2);
+        markPlace(player, loc, name, radius, (Math.abs(y - yRadius)/2), radius, radius);
+    }
+
+    public void markPlace(Player player, Location loc, String name, int rx, int ry, int rz, int radius)
     {
 //    	if (config.opsOnly() && !player.isOp()) {
 //    		player.sendMessage(ChatColor.RED + "ops only!");
 //    		return;
 //    	}
-    	
+
     	Place nearest = nearestPlace(player);
-    	
+
     	if (nearest != null && nearest.distance( player.getLocation() ) < 5) {
     		player.sendMessage(ChatColor.RED + "Too close to " + nearest.toString() + "!");
     		return;
     	}
-    	
+
     	if (name == null || name.trim().equals( "" )) {
     		player.sendMessage(ChatColor.RED + "You must supply a name!");
     		return;
     	}
-    	
+
     	Place mark = null;
-    	if ( radius > 0 )
-    		mark = new Place(player.getLocation(), radius, (int) player.getWorld().getId(), name, player.getDisplayName());
+    	if ( radius != -1 )
+    		mark = new Place(loc, radius, ry, (int) player.getWorld().getId(), name, player.getDisplayName());
     	else
-    		player.sendMessage(ChatColor.RED + "Error: Feature not implemented");
-        mark.setYDist(depth);
-        
+    		mark = new Place(loc, rx, ry, rz, (int) player.getWorld().getId(), name, player.getDisplayName());
+
     	places.getPlaces().add(mark);
         places.updateData();
     	player.sendMessage(ChatColor.BLUE + "marked " + mark.toString());
-    	
+
     	for (Player p : getServer().getOnlinePlayers())
     		updateCurrent(p);
     }
-    
+
+
     public void unmarkPlace(Player player)
     {
 //    	if (config.opsOnly() && !player.isOp()) {
 //    		player.sendMessage(ChatColor.RED + "ops only!");
 //    		return;
 //    	}
-
     	
     	Place nearest = nearestPlace(player);
         if (nearest == null) {
     		player.sendMessage(ChatColor.RED + "Nothing to unmark!");
     		return;
     	}
-    	if (player.isOp() || player.getDisplayName().equals(nearest.getOwner())) {
+
+
+    	if (player.isOp() || player.getDisplayName().equals(nearest.getOwner()) || nearest.getOwner().equals("[none]") ) {
             places.getPlaces().remove(nearest);
             places.updateData();
             player.sendMessage(ChatColor.RED + "Unmarked " + nearest.toString());
 
             for (Player p : getServer().getOnlinePlayers())
                     updateCurrent(p);
+        } else {
+            player.sendMessage(ChatColor.RED + "You can't unmark a point you don't own!");
         }
     }
     

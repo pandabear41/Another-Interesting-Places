@@ -15,16 +15,14 @@ public class Place implements Serializable {
     private int yDist;
     private int zDist;
     private int world;
-    private boolean ignoreY;
     private String name;
     private String ownername;
 
-    public Place(Location loc, int radius, int world, String name, String ownername)
+    public Place(Location loc, int radius, int ignoreY, int world, String name, String ownername)
     {
-        xDist = -1;
-        yDist = -1;
-        zDist = -1;
-        ignoreY = false;
+        xDist = radius;
+        yDist = ignoreY;
+        zDist = radius;
         x = loc.getBlockX();
         y = loc.getBlockY();
         z = loc.getBlockZ();
@@ -34,16 +32,15 @@ public class Place implements Serializable {
         this.ownername = ownername;
     }
 
-    public Place(Location loc, int x, int y, int z, int world, String name, String ownername)
+    public Place(Location loc, int rx, int ry, int rz, int world, String name, String ownername)
     {
+        x = loc.getBlockX();
+        y = loc.getBlockY();
+        z = loc.getBlockZ();
+        xDist = rx;
+        yDist = ry;
+        zDist = rz;
         radius = -1;
-        ignoreY = false;
-        this.x = loc.getBlockX();
-        this.y = loc.getBlockY();
-        this.z = loc.getBlockZ();
-        xDist = x;
-        yDist = y;
-        zDist = z;
         this.name = name;
         this.world = world;
         this.ownername = ownername;
@@ -52,20 +49,23 @@ public class Place implements Serializable {
     public double distance(Location loc)
     {
         double r = 0;
-        r += Math.pow( x - loc.getBlockX(), 2);
-        r += (yDist == -1 || ignoreY) ? (Math.pow( y - loc.getBlockY(), 2)) : 0; // If there is a depth we want to calculate it seperately.
-        r += Math.pow( z - loc.getBlockZ(), 2);
+        r += (xDist == -1) ? 0 : Math.pow( x - loc.getBlockX(), 2);
+        r += (yDist == -1) ? 0 : Math.pow( y - loc.getBlockY(), 2); 
+        r += (zDist == -1) ? 0 : Math.pow( z - loc.getBlockZ(), 2);
         return Math.sqrt(r);
     }
 
-
-
     public boolean inRange(Location loc)
     {
-        if (yDist == -1)
-            return (distance(loc) <= radius);
-        else
-            return (distance(loc) <= radius) && ((y - yDist) < loc.getBlockY() && (y + yDist) > loc.getBlockY());
+        if (radius != -1)
+            return (distance(loc) <= radius && (yDist == -1) ? true : ((y - yDist) <= loc.getBlockY() && (y + yDist) >= loc.getBlockY()));
+        else {
+            boolean rangeX, rangeY, rangeZ;
+            rangeX = (xDist == -1) ? true : ((x - xDist) <= loc.getBlockX() && (x + xDist) >= loc.getBlockX());
+            rangeY = (yDist == -1) ? true : ((y - yDist) <= loc.getBlockY() && (y + yDist) >= loc.getBlockY());
+            rangeZ = (zDist == -1) ? true : ((z - zDist) <= loc.getBlockZ() && (z + zDist) >= loc.getBlockZ());
+            return (rangeX && rangeY && rangeZ);
+        }
     }
 
     public void setX(int x) {
@@ -116,14 +116,6 @@ public class Place implements Serializable {
         return zDist;
     }
 
-    public void setIgnoreY(boolean ignore) {
-        ignoreY = ignore;
-    }
-
-    public boolean getIgnoreY() {
-        return ignoreY;
-    }
-
     public float getRadius()
     {
         return radius;
@@ -136,12 +128,12 @@ public class Place implements Serializable {
 
     public int getWorld()
     {
-            return world;
+        return world;
     }
 
     public String getName()
     {
-            return name;
+        return name;
     }
 
     public String getOwner() {
