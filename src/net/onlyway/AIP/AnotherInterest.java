@@ -293,8 +293,8 @@ public class AnotherInterest extends JavaPlugin {
     public void markPlace(Player player, String name, int radius, int y, int yRadius)
     {
         Location loc = player.getLocation();
-        loc.setY(y + Math.abs(y - yRadius)/2);
-        markPlace(player, loc, name, radius, (Math.abs(y - yRadius)/2), radius, radius);
+        loc.setY(y + (yRadius - y)/2);
+        markPlace(player, loc, name, radius, (Math.abs(yRadius - y)/2), radius, radius);
     }
 
     public void markPlace(Player player, Location loc, String name, int rx, int ry, int rz, int radius)
