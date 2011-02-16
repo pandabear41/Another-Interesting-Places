@@ -12,10 +12,6 @@ To use, type "/aip mark", "/aip unmark", "/aip nearest", or "/aip who" in chat
 to use the marking feature.
 
 
-To build this plugin from source, you'll need OLib, found at
-http://github.com/Nayruden/olib
-
-
 --COMMAND SYNTAX--
 
 *******************************************************************************
@@ -23,6 +19,8 @@ COMMAND:
 /aip mark [Name]:[Radius]
 or
 /aip mark [Name]:[Radius],[Y Radius]
+or 
+/aip mark [Name]:[Radius],[Y Start]-[Y End]
 
 DESCRIPTION:
 Mark sets a point and radius on the map that other players will see.
@@ -57,9 +55,6 @@ Add
 Add 
 /aip mark [Name]:[X],[Y],[Z],[Dx],[Dy],[Dz]
 
-Add
-/aip mark [Name]:[Radius],[Y Start],[Y End]
-
 Add 
 /aip who
 or 
@@ -67,10 +62,10 @@ or
 
 
 
-
-
 -- CHANGELOG --
 
+v0.4 - 2/16/2011
+    * Initial release.
 
 
 -- LICENSE --
