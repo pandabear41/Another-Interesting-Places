@@ -299,10 +299,10 @@ public class AnotherInterest extends JavaPlugin {
 
     public void markPlace(Player player, Location loc, String name, int rx, int ry, int rz, int radius)
     {
-//    	if (config.opsOnly() && !player.isOp()) {
-//    		player.sendMessage(ChatColor.RED + "ops only!");
-//    		return;
-//    	}
+    	if (getConfiguration().getBoolean("ops-only-mark", false) && !player.isOp()) {
+    		player.sendMessage(ChatColor.RED + "You must be a op to use this command!");
+    		return;
+    	}
 
     	Place nearest = nearestPlace(player);
 
@@ -333,10 +333,10 @@ public class AnotherInterest extends JavaPlugin {
 
     public void unmarkPlace(Player player)
     {
-//    	if (config.opsOnly() && !player.isOp()) {
-//    		player.sendMessage(ChatColor.RED + "ops only!");
-//    		return;
-//    	}
+    	if (getConfiguration().getBoolean("ops-only-unmark", false) && !player.isOp()) {
+    		player.sendMessage(ChatColor.RED + "You must be a op to use this command!");
+    		return;
+    	}
     	
     	Place nearest = nearestPlace(player);
         if (nearest == null) {

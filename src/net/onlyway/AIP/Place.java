@@ -143,7 +143,7 @@ public class Place implements Serializable {
     @Override
     public String toString() {
 
-        return ChatColor.WHITE + name + " [" + Integer.toString( x ) + ", " + Integer.toString( y ) + ", " + Integer.toString( z ) + ", Radius:" + Integer.toString( radius ) + "]";
+        return ChatColor.WHITE + name + " [" + Integer.toString(x) + ", " + Integer.toString(y) + ", " + Integer.toString(z) + "] Radius:[" + Integer.toString(xDist) + ", " + Integer.toString(yDist) + ", " + Integer.toString(zDist) + "]";
     }
 	
 }

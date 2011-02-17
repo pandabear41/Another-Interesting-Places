@@ -1,9 +1,15 @@
+# See the syntax for the text in the readme.
+
 # The text to display when a player enters a zone.
 entered-zone-text: "entering"
 # The text to display when a player is in no zone.
 no-zone-text: "entering wilderness"
 # Will the zone left be displayed when leaving a zone.
 no-zone-name: false
+# Will only ops be able to use /mark
+ops-only-mark: false
+# Will only ops be able to use /unmark
+ops-only-unmark: false
 # Debug the plugin?
 debug: false
 #    private String whoHead	       = "§e$1 player(s) online:";
