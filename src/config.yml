@@ -12,6 +12,8 @@ ops-only-mark: false
 ops-only-unmark: false
 # Radius limit.
 radius-limit: 1000
+# The default radius if the user does not specify one.
+radius-default: 25
 
 # Debug the plugin?
 debug: false

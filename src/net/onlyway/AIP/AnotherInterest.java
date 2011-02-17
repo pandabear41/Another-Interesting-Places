@@ -120,24 +120,27 @@ public class AnotherInterest extends JavaPlugin {
            
             if (args[0].equalsIgnoreCase("mark")) {
                 String[] sstring = arrayToString(args, " ", 1).split(":");
-                if (sstring.length < 2) {
-                    player.sendMessage(ChatColor.RED + "Invalid Command Syntax!");
-                    player.sendMessage(ChatColor.RED + "USE /aip mark [Name]:[Radius]");
-                    return false;
+                if (sstring.length == 1) {
+                    // Mark the point.
+                    markPlace(player, sstring[0], getConfiguration().getInt("radius-default", 25), true);
+                    return true;
                 }
 
                 String name = sstring[0];
                 String lprms = sstring[1];
                 String[] parms = lprms.split(",");
                 int rlimit = getConfiguration().getInt("radius-limit", 1000);
-                int r = Integer.parseInt(parms[0]);
-                // Check the radius.
-                if (r < 0 || r > rlimit) 
-                    player.sendMessage(ChatColor.RED + "The radius must be between 0 and " + Integer.toString(rlimit) + "!");
-                
+                int r = 0;
+                if (parms.length > 0) {
+                    r = Integer.parseInt(parms[0]);
+                    // Check the radius.
+                    if (r < 0 || r > rlimit)
+                        player.sendMessage(ChatColor.RED + "The radius must be between 0 and " + Integer.toString(rlimit) + "!");
+                        return false;
+                }
+
                 if (parms.length == 1) {  //Only Radius entered.
                     try {
-
                         // Mark the point.
                         markPlace(player, name, r, true);
                     } catch ( NumberFormatException e ) {
@@ -168,7 +171,7 @@ public class AnotherInterest extends JavaPlugin {
                             return false;
                         }
                     }
-                }
+                } 
             } else if (args[0].equalsIgnoreCase("unmark")) {
                 unmarkPlace(player);
             } else if (args[0].equalsIgnoreCase("nearest")) {
