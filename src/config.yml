@@ -6,10 +6,13 @@ entered-zone-text: "entering"
 no-zone-text: "entering wilderness"
 # Will the zone left be displayed when leaving a zone.
 no-zone-name: false
-# Will only ops be able to use /mark
+# Will only ops be able to use /mark.
 ops-only-mark: false
-# Will only ops be able to use /unmark
+# Will only ops be able to use /unmark.
 ops-only-unmark: false
+# Radius limit.
+radius-limit: 1000
+
 # Debug the plugin?
 debug: false
 #    private String whoHead	       = "§e$1 player(s) online:";

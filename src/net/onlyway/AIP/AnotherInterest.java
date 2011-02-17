@@ -129,39 +129,46 @@ public class AnotherInterest extends JavaPlugin {
                 String name = sstring[0];
                 String lprms = sstring[1];
                 String[] parms = lprms.split(",");
+                int rlimit = getConfiguration().getInt("radius-limit", 1000);
+                int r = Integer.parseInt(parms[0]);
+                // Check the radius.
+                if (r < 0 || r > rlimit) 
+                    player.sendMessage(ChatColor.RED + "The radius must be between 0 and " + Integer.toString(rlimit) + "!");
+                
                 if (parms.length == 1) {  //Only Radius entered.
                     try {
-                        markPlace(player, name, Integer.parseInt(parms[0]), true);
+
+                        // Mark the point.
+                        markPlace(player, name, r, true);
                     } catch ( NumberFormatException e ) {
                         player.sendMessage(ChatColor.RED + "Error in radius entry!");
                         player.sendMessage(ChatColor.RED + "USE /aip mark [Name]:[Radius]");
                         return false;
                     }
-                } else if (parms.length == 2) { //Radius and depth entered.
-                    if (parms[1].contains("-")) {
+                } else if (parms.length == 2) { 
+                    if (parms[1].contains("-")) { // Radius, Y begining, Y end entered.
                         String[] oparms = parms[1].split("-");
                         if (oparms.length == 2) {
                             try {
-                                 markPlace(player, name, Integer.parseInt(parms[0]), Integer.parseInt(oparms[0]), Integer.parseInt(oparms[1]));
+                                // Mark the point.
+                                markPlace(player, name, r, Integer.parseInt(oparms[0]), Integer.parseInt(oparms[1]));
                             } catch ( NumberFormatException e ) {
                                 player.sendMessage(ChatColor.RED + "Error in data entry!");
                                 player.sendMessage(ChatColor.RED + "USE /aip mark [Name]:[Radius],[Y Start]-[Y End]");
                                 return false;
                             }
                         }
-                    } else {
+                    } else { // Radius and Y radius entered.
                         try {
-                             markPlace(player, name, Integer.parseInt(parms[0]), Integer.parseInt(parms[1]));
+                            // Mark the point.
+                            markPlace(player, name, r, Integer.parseInt(parms[1]));
                         } catch ( NumberFormatException e ) {
                             player.sendMessage(ChatColor.RED + "Error in data entry!");
                             player.sendMessage(ChatColor.RED + "USE /aip mark [Name]:[Radius],[Y Radius]");
                             return false;
                         }
                     }
-
                 }
-
-                
             } else if (args[0].equalsIgnoreCase("unmark")) {
                 unmarkPlace(player);
             } else if (args[0].equalsIgnoreCase("nearest")) {
