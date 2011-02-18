@@ -20,32 +20,29 @@ public class Place implements Serializable {
 
     public Place(Location loc, int radius, int ignoreY, int world, String name, String ownername)
     {
-        xDist = radius;
-        yDist = ignoreY;
-        zDist = radius;
-        x = loc.getBlockX();
-        y = loc.getBlockY();
-        z = loc.getBlockZ();
-        this.radius = radius;
-        this.name = name;
-        this.world = world;
-        this.ownername = ownername;
+        this.setPlace(loc, radius, ignoreY, radius, radius, world, name, ownername);
     }
 
     public Place(Location loc, int rx, int ry, int rz, int world, String name, String ownername)
     {
+        this.setPlace(loc, rx, ry, rz, -1, world, name, ownername);
+    }
+
+    private void setPlace(Location loc, int rx, int ry, int rz, int radius, int world, String name, String ownername) {
         x = loc.getBlockX();
         y = loc.getBlockY();
         z = loc.getBlockZ();
         xDist = rx;
         yDist = ry;
         zDist = rz;
-        radius = -1;
+        this.radius = radius;
         this.name = name;
         this.world = world;
         this.ownername = ownername;
     }
 
+
+    // Get the distance from a location.
     public double distance(Location loc)
     {
         double r = 0;
@@ -55,6 +52,7 @@ public class Place implements Serializable {
         return Math.sqrt(r);
     }
 
+    // Determine weather the location is in range.
     public boolean inRange(Location loc)
     {
         if (radius != -1)

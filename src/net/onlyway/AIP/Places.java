@@ -25,12 +25,14 @@ public class Places {
     {
         this.plugin = plugin;
         try {
+            // Open up the file.
             FileInputStream reader = new FileInputStream(plugin.getDataFolder() + File.separator + AnotherInterest.DATA_FILE);
             ObjectInputStream oin = new ObjectInputStream(reader);
 
 
             Object obj = null ;
             try {
+                // Read the place object and put it into the array.
                 while ((obj = oin.readObject()) != null) {
                     if (obj instanceof Place) {
                         Place plac = (Place) obj;
@@ -43,6 +45,7 @@ public class Places {
         }
     }
 
+    // Converter for the old Interesting Places format.
     public boolean convertOld(String filename, Server server) {
         File old_file = new File(plugin.getDataFolder(), filename);
         if (!old_file.isFile()) {
@@ -74,6 +77,7 @@ public class Places {
         return true;
     }
 
+    // Parses the old format.
     public void addOld(String s, boolean v1_1, Server server) {
         Place myPlace = null;
         Location loc;
@@ -101,21 +105,20 @@ public class Places {
             }
         } else {
             String[] args = s.split( " ", 4 );
-// TODO: Add a place with default radius.
-//            x = Integer.parseInt( args[ 0 ] );
-//            y = Integer.parseInt( args[ 1 ] );
-//            z = Integer.parseInt( args[ 2 ] );
-//            name = args[ 3 ].replaceAll( "##", "§" );
+            loc =  new Location(world, Integer.parseInt(args[0]), Integer.parseInt(args[1]), Integer.parseInt(args[2]));
+            myPlace = new Place(loc, plugin.getConfiguration().getInt("radius-default", 25), -1, (int) world.getId(), args[3].replaceAll( "##", "§" ), "[none]");
         }
         places.add(myPlace);
 
     }
 
+    // Get the array of the places.
     public ArrayList<Place> getPlaces()
     {
         return places;
     }
-    
+
+    // Get the nearest place in the radius circle.
     public Place getNearestRadius(Location loc, int world) {
         Iterator placs = places.iterator();
 
@@ -140,6 +143,7 @@ public class Places {
 
     }
 
+    // Get the nearest place.
     public Place getNearest(Location loc, int world) {
         Iterator placs = places.iterator();
 
@@ -164,9 +168,11 @@ public class Places {
     void updateData()
     {
         try {
+            // Open up the file.
             FileOutputStream writer = new FileOutputStream(plugin.getDataFolder() + File.separator + AnotherInterest.DATA_FILE);
-
             ObjectOutputStream oout = new ObjectOutputStream (writer);
+
+            // Output all of the places to the file.
             for (Place p : places) {
                 oout.writeObject(p);
             }

@@ -44,18 +44,21 @@ public class AnotherInterest extends JavaPlugin {
         PluginManager pm = getServer().getPluginManager();
         PluginDescriptionFile pdfFile = this.getDescription();
 
+        // Register out events.
         pm.registerEvent(Event.Type.PLAYER_JOIN,    player,  Priority.Monitor, this);
         pm.registerEvent(Event.Type.PLAYER_QUIT,    player,  Priority.Monitor, this);
         pm.registerEvent(Event.Type.PLAYER_MOVE,    player,  Priority.Normal, this);
         pm.registerEvent(Event.Type.VEHICLE_MOVE,   vehicle, Priority.Normal, this);
 
-        // Thanks Zoot. 
+        // Thanks Zoot.
+        // Write out the config if it does not exits.
         getDataFolder().mkdirs(); // Make sure dir exists
         File config_file = new File(getDataFolder(), "config.yml");
         if (!config_file.isFile()) {
             extractResourceTo("/config.yml", config_file.getPath());
             System.out.println("A default config file was created for " + pdfFile + ". Please restart the server to ensure that the config is loaded.");
         }
+
         System.out.println(pdfFile.getName() + " version " + pdfFile.getVersion() + " has been loaded.");
     }
 
@@ -94,18 +97,20 @@ public class AnotherInterest extends JavaPlugin {
     @Override
     public void onDisable()
     {
+        // Save when the plugin is disabled.
         places.updateData();
     }
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String commandLabel, String[] args) {
         if (command.getName().equalsIgnoreCase("aip")) {
-            if (!(sender instanceof Player)) {
+            if (!(sender instanceof Player)) { // Make sure its only a player tring to use the command.
                 sender.sendMessage("Only players can use this command");
                 return false;
             }
 
             Player player = (Player) sender;
+            // The help that will be displayed if a command is entered wrong.
             if (args.length < 1 || !((args[0].equalsIgnoreCase("mark") && args.length > 1) || args[0].equalsIgnoreCase("unmark") || args[0].equalsIgnoreCase("nearest") || args[0].equalsIgnoreCase("who"))) {
                 player.sendMessage(ChatColor.RED + "/aip <unmark,nearest,who>");
                 player.sendMessage(ChatColor.RED + "OR /aip mark [Name]:[Radius]");
@@ -117,21 +122,24 @@ public class AnotherInterest extends JavaPlugin {
                 player.sendMessage(ChatColor.RED + "who - List connected players and the areas they are in");
                 return false;
             }
-           
+
+            // Our mark command.
             if (args[0].equalsIgnoreCase("mark")) {
                 String[] sstring = arrayToString(args, " ", 1).split(":");
-                if (sstring.length == 1) {
+                if (sstring.length == 1) { // We want to mark a point even if there is no radius specified.
                     // Mark the point.
                     markPlace(player, sstring[0], getConfiguration().getInt("radius-default", 25), true);
                     return true;
                 }
 
+                // Some var stuff.
                 String name = sstring[0];
                 String lprms = sstring[1];
                 String[] parms = lprms.split(",");
+
                 int rlimit = getConfiguration().getInt("radius-limit", 1000);
                 int r = 0;
-                if (parms.length > 0) {
+                if (parms.length > 0) { // Make sure there is a radius first.
                     r = Integer.parseInt(parms[0]);
                     // Check the radius.
                     if (r < 0 || r > rlimit)
@@ -172,9 +180,9 @@ public class AnotherInterest extends JavaPlugin {
                         }
                     }
                 } 
-            } else if (args[0].equalsIgnoreCase("unmark")) {
+            } else if (args[0].equalsIgnoreCase("unmark")) { // The unmark command.
                 unmarkPlace(player);
-            } else if (args[0].equalsIgnoreCase("nearest")) {
+            } else if (args[0].equalsIgnoreCase("nearest")) { // The nearest command.
                 sendNearest(player);
             }
         }
@@ -184,6 +192,8 @@ public class AnotherInterest extends JavaPlugin {
     public static String arrayToString(String[] a, String separator) {
         return arrayToString(a, separator, 0);
     }
+
+    // A function to convert a array to a string.
     public static String arrayToString(String[] a, String separator, int init) {
         StringBuilder result = new StringBuilder();
         if (a.length > init) {
@@ -196,6 +206,7 @@ public class AnotherInterest extends JavaPlugin {
         return result.toString();
     }
 
+    // Get the nearest place to the player.
     private Place nearestPlace(Player player)
     {
     	if (places == null)
@@ -203,6 +214,7 @@ public class AnotherInterest extends JavaPlugin {
     	return places.getNearest(player.getLocation(), (int) player.getWorld().getId());
     }
 
+    // Get the nearest place to the player that is in the radius range.
     private Place nearestPlaceInRange(Player player)
     {
     	if (places == null)
@@ -210,17 +222,24 @@ public class AnotherInterest extends JavaPlugin {
     	return places.getNearestRadius(player.getLocation(), (int) player.getWorld().getId());
     }
 
+    // Update the players location and send out the text if needed.
     public void updateCurrent(Player player)
     {
+        // We want to check every 3 seconds.
     	if (times.containsKey(player) && System.currentTimeMillis() - times.get( player ) < 3000 )
     		return;
-    	
+
+        // Grab the nearest place that is in range of the player.
     	Place place = nearestPlaceInRange(player);
+        // DEBUG stuff.
         if (place != null && getConfiguration().getBoolean("debug",false)) player.sendMessage(ChatColor.WHITE + "Distance from:" + place.distance(player.getLocation()) + ". Y Axis:" + player.getLocation().getY() );
+
+        // Grab the old location.
         Place old = null;
         if (current.containsKey(player))
             old = current.get(player);
 
+        // Check if the player has entered a new location or the wilderness.
         if ((place != old || !current.containsKey(player)) && !(old != null && place != null && old.getName().equals(place.getName()))) {
             if ( place == null ) {
                 if ( old != null && getConfiguration().getBoolean("no-zone-name", false))
@@ -231,16 +250,19 @@ public class AnotherInterest extends JavaPlugin {
                 player.sendMessage(ChatColor.DARK_AQUA + getConfiguration().getString("entered-zone-text") + ChatColor.WHITE + " " + place.getName());
             }
         }
+        // Put the players delay and his current place.
 	times.put(player, System.currentTimeMillis());
         current.put(player, place);
     }
-    
+
+    // Remove the current place and time.
     public void removeCurrent(Player player)
     {
     	current.remove(player);
     	times.remove(player);
     }
-    
+
+    // Not implemented yet. But this is the code from the old project.
 //    public void sendWho(Player player)
 //    {
 //    	Player[] players = getServer().getOnlinePlayers();
@@ -276,7 +298,8 @@ public class AnotherInterest extends JavaPlugin {
 //    		player.sendMessage(ChatColor.RED + "Player not found!");
 //    	}
 //    }
-    
+
+    // The /nearest command.
     public void sendNearest(Player player)
     {
     	Place nearest = nearestPlace(player);
@@ -284,22 +307,25 @@ public class AnotherInterest extends JavaPlugin {
     		player.sendMessage(nearest.toString());
     }
 
-
+    // One mark command that is not needed.
     public void markPlace(Player player, String name, int radius)
     {
          markPlace(player, name, radius, true);
     }
 
+    // The mark command needed for /aip mark [Name]:[Radius]
     public void markPlace(Player player, String name, int radius, boolean ignoreY)
     {
         markPlace(player, player.getLocation(), name, radius, (ignoreY) ? -1 : radius, radius, radius);
     }
 
+    // The mark command needed for /aip mark [Name]:[Radius],[Y Radius]
     public void markPlace(Player player, String name, int radius, int yRadius)
     {
         markPlace(player, player.getLocation(), name, radius, yRadius, radius, radius);
     }
 
+    // The mark command needed for /aip mark [Name]:[Radius],[Y Start]-[Y End]
     public void markPlace(Player player, String name, int radius, int y, int yRadius)
     {
         Location loc = player.getLocation();
@@ -307,20 +333,23 @@ public class AnotherInterest extends JavaPlugin {
         markPlace(player, loc, name, radius, (Math.abs(yRadius - y)/2), radius, radius);
     }
 
+    // The mark command.
     public void markPlace(Player player, Location loc, String name, int rx, int ry, int rz, int radius)
     {
+        // Check to see if only ops can use this command.
     	if (getConfiguration().getBoolean("ops-only-mark", false) && !player.isOp()) {
     		player.sendMessage(ChatColor.RED + "You must be a op to use this command!");
     		return;
     	}
 
+        // Get the nearest point from the player to see if he is too close to another point.
     	Place nearest = nearestPlace(player);
-
     	if (nearest != null && nearest.distance( player.getLocation() ) < 5) {
     		player.sendMessage(ChatColor.RED + "Too close to " + nearest.toString() + "!");
     		return;
     	}
 
+        // Make sure a name is supplied.
     	if (name == null || name.trim().equals( "" )) {
     		player.sendMessage(ChatColor.RED + "You must supply a name!");
     		return;
@@ -328,10 +357,13 @@ public class AnotherInterest extends JavaPlugin {
 
     	Place mark = null;
     	if ( radius != -1 )
+                // Make a place with a radius.
     		mark = new Place(loc, radius, ry, (int) player.getWorld().getId(), name, player.getDisplayName());
     	else
+                // Make a place with a custom radius.
     		mark = new Place(loc, rx, ry, rz, (int) player.getWorld().getId(), name, player.getDisplayName());
 
+        // Add the place to the structure and save it.
     	places.getPlaces().add(mark);
         places.updateData();
     	player.sendMessage(ChatColor.BLUE + "marked " + mark.toString());
@@ -343,23 +375,27 @@ public class AnotherInterest extends JavaPlugin {
 
     public void unmarkPlace(Player player)
     {
+        // Check to see if only ops can use this command.
     	if (getConfiguration().getBoolean("ops-only-unmark", false) && !player.isOp()) {
     		player.sendMessage(ChatColor.RED + "You must be a op to use this command!");
     		return;
     	}
-    	
+
+        // Check to see if there is even a place to unmark.
     	Place nearest = nearestPlace(player);
         if (nearest == null) {
     		player.sendMessage(ChatColor.RED + "Nothing to unmark!");
     		return;
     	}
 
-
+        // Make sure that the player is the owner so griefers don't remove other peoples places.
     	if (player.isOp() || player.getDisplayName().equals(nearest.getOwner()) || nearest.getOwner().equals("[none]") ) {
+            // Remove the nearest place and save the file.
             places.getPlaces().remove(nearest);
             places.updateData();
             player.sendMessage(ChatColor.RED + "Unmarked " + nearest.toString());
 
+            // Update all of the current players to reflect the change.
             for (Player p : getServer().getOnlinePlayers())
                     updateCurrent(p);
         } else {
