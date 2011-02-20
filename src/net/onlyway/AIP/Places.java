@@ -91,7 +91,6 @@ public class Places {
             if (world.getEnvironment() == Environment.NORMAL) break;
         }
 
-
         if ( v1_1 ) {
             String[] xyz = s.split( " ", 2 );
             if ( xyz[ 0 ].equalsIgnoreCase( "xyz" ) ) {
@@ -109,7 +108,6 @@ public class Places {
             myPlace = new Place(loc, plugin.getConfiguration().getInt("radius-default", 25), -1, (int) world.getId(), args[3].replaceAll( "##", "§" ), "[none]");
         }
         places.add(myPlace);
-
     }
 
     // Get the array of the places.

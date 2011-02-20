@@ -41,7 +41,6 @@ public class Place implements Serializable {
         this.ownername = ownername;
     }
 
-
     // Get the distance from a location.
     public double distance(Location loc)
     {
