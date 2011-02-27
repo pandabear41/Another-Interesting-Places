@@ -14,7 +14,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.Event.Priority;
 import org.bukkit.event.Event;
 import org.bukkit.plugin.PluginDescriptionFile;
-import org.bukkit.plugin.PluginLoader;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -24,25 +23,24 @@ public class AnotherInterest extends JavaPlugin {
 
     private final AnotherInterestPlayer player = new AnotherInterestPlayer(this);
     private final AnotherInterestVehicle vehicle = new AnotherInterestVehicle(this);
-    private final Places places = new Places(this);
+    private Places places;
     
     private HashMap<Player,Place> current = new HashMap<Player,Place>();
     private HashMap<Player,Long> times = new HashMap<Player,Long>();
-
-    public AnotherInterest(PluginLoader loader, Server server, PluginDescriptionFile pdf, File dir, File plugin, ClassLoader classLoader)
-    {
-        super( loader, server, pdf, dir, plugin, classLoader );
-    	places.updateData();
-        if (places.convertOld("places.txt", server))
-            System.out.println("An old interesting places file was loaded.");
-
-    }
+   
 
     @Override
     public void onEnable()
     {
         PluginManager pm = getServer().getPluginManager();
         PluginDescriptionFile pdfFile = this.getDescription();
+
+        // Odd problem with bukkit.
+        places = new Places(this);
+
+        // Load the old config if it exists.
+        if (places.convertOld("places.txt", getServer()))
+            System.out.println("An old interesting places file was loaded.");
 
         // Register out events.
         pm.registerEvent(Event.Type.PLAYER_JOIN,    player,  Priority.Monitor, this);
@@ -108,7 +106,7 @@ public class AnotherInterest extends JavaPlugin {
                 sender.sendMessage("Only players can use this command");
                 return false;
             }
-
+            
             Player player = (Player) sender;
             // The help that will be displayed if a command is entered wrong.
             if (args.length < 1 || !((args[0].equalsIgnoreCase("mark") && args.length > 1) || args[0].equalsIgnoreCase("unmark") || args[0].equalsIgnoreCase("nearest") || args[0].equalsIgnoreCase("who"))) {
@@ -131,7 +129,6 @@ public class AnotherInterest extends JavaPlugin {
                     markPlace(player, sstring[0], getConfiguration().getInt("radius-default", 25), true);
                     return true;
                 }
-
                 // Some var stuff.
                 String name = sstring[0];
                 String lprms = sstring[1];
@@ -142,10 +139,12 @@ public class AnotherInterest extends JavaPlugin {
                 if (parms.length > 0) { // Make sure there is a radius first.
                     r = Integer.parseInt(parms[0]);
                     // Check the radius.
-                    if (r < 0 || r > rlimit)
+                    if (r < 0 || r > rlimit) {
                         player.sendMessage(ChatColor.RED + "The radius must be between 0 and " + Integer.toString(rlimit) + "!");
                         return false;
+                    }
                 }
+
 
                 if (parms.length == 1) {  //Only Radius entered.
                     try {
@@ -156,7 +155,7 @@ public class AnotherInterest extends JavaPlugin {
                         player.sendMessage(ChatColor.RED + "USE /aip mark [Name]:[Radius]");
                         return false;
                     }
-                } else if (parms.length == 2) { 
+                } else if (parms.length == 2) {
                     if (parms[1].contains("-")) { // Radius, Y begining, Y end entered.
                         String[] oparms = parms[1].split("-");
                         if (oparms.length == 2) {

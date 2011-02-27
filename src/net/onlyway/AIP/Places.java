@@ -29,7 +29,6 @@ public class Places {
             FileInputStream reader = new FileInputStream(plugin.getDataFolder() + File.separator + AnotherInterest.DATA_FILE);
             ObjectInputStream oin = new ObjectInputStream(reader);
 
-
             Object obj = null ;
             try {
                 // Read the place object and put it into the array.
@@ -74,6 +73,7 @@ public class Places {
         catch ( IOException e ) {
         }
         old_file.delete();
+        this.updateData();
         return true;
     }
 

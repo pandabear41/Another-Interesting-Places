@@ -1,8 +1,8 @@
 Another Interesting Places <Fork of Interesting Places>
+Copyright (c) 2011 Pandabear41 <http://onlywaysoftware.com/>
+
 Parts of the Code was taken from: grandseiken @ 
 <http://forums.bukkit.org/threads/info-interesting-places-1-2-name-areas-in-the-world.1463/>
-
-Copyright (c) 2011 Pandabear41 <http://onlywaysoftware.com/>
 
 Another Interesting Places allows you to mark a point in the world and give it
 a name. So that when travelers are passing by they will see that someones 
@@ -16,6 +16,9 @@ to use the marking feature.
 
 *******************************************************************************
 COMMAND:
+/aip mark [Name]
+<Makes the point the default radius>
+or
 /aip mark [Name]:[Radius]
 or
 /aip mark [Name]:[Radius],[Y Radius]
@@ -48,9 +51,6 @@ DESCRIPTION:
 Who displays the logged in players and the zones that they are in.
 *******************************************************************************
 -- TODO --
-Add
-/aip mark [Name]
-<Makes the point the default radius>
 
 Add 
 /aip mark [Name]:[X],[Y],[Z],[Dx],[Dy],[Dz]
@@ -63,6 +63,12 @@ or
 
 
 -- CHANGELOG --
+
+v0.5 - 2/20/2011
+    * [ADD] If there is no radius entered it defaults to one in the config.
+    * [ADD] Config to allow only ops to use the commands.
+    * [FIX] It now checks if the radius is negative or out of range (specified in config)
+    * [FIX] Calculations in determining the y distance.
 
 v0.4 - 2/16/2011
     * Initial release.
