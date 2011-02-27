@@ -64,6 +64,9 @@ or
 
 -- CHANGELOG --
 
+v.06 - 2/26/2011
+	* [FIX] Problems from a recent Bukkit update.
+
 v0.5 - 2/20/2011
     * [ADD] If there is no radius entered it defaults to one in the config.
     * [ADD] Config to allow only ops to use the commands.

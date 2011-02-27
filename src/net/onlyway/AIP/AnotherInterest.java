@@ -27,7 +27,6 @@ public class AnotherInterest extends JavaPlugin {
     
     private HashMap<Player,Place> current = new HashMap<Player,Place>();
     private HashMap<Player,Long> times = new HashMap<Player,Long>();
-   
 
     @Override
     public void onEnable()
