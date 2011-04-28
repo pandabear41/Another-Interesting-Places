@@ -122,93 +122,102 @@ public class AnotherInterest extends JavaPlugin {
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String commandLabel, String[] args) {
-        if (command.getName().equalsIgnoreCase("aip")) {
-            if (!(sender instanceof Player)) { // Make sure its only a player tring to use the command.
-                sender.sendMessage("Only players can use this command");
-                return false;
-            }
-            
-            Player player = (Player) sender;
-            // The help that will be displayed if a command is entered wrong.
-            if (args.length < 1 || !((args[0].equalsIgnoreCase("mark") && args.length > 1) || args[0].equalsIgnoreCase("unmark") || args[0].equalsIgnoreCase("nearest") || args[0].equalsIgnoreCase("who"))) {
-                player.sendMessage(ChatColor.RED + "/aip <unmark,nearest,who>");
-                player.sendMessage(ChatColor.RED + "OR /aip mark [Name]:[Radius]");
-                player.sendMessage(ChatColor.RED + "OR /aip mark [Name]:[Radius],[Y Radius]");
-                player.sendMessage(ChatColor.RED + "OR /aip who [Player Name]");
-                player.sendMessage(ChatColor.RED + "mark - Mark a position on the map with a name.");
-                player.sendMessage(ChatColor.RED + "unmark - Unmark the nearest marked position");
-                player.sendMessage(ChatColor.RED + "nearest - Displays the nearest marked position");
-                player.sendMessage(ChatColor.RED + "who - List connected players and the areas they are in");
-                return false;
-            }
+        if (command.getName().equalsIgnoreCase("mark")) { // The mark command.
+			// Set up the player.
+			if (!checkPlayer()) return false;
+			Player player = (Player) sender;
+			
+			// Help to be displayed if no input
+			if (args == "" || args == " ") {
+				player.sendMessage(ChatColor.RED + "Syntax is:");
+				player.sendMessage(ChatColor.RED + "USE /aip mark [Name]");
+				player.sendMessage(ChatColor.RED + "USE /aip mark [Name]:[Radius]");
+				player.sendMessage(ChatColor.RED + "USE /aip mark [Name]:[Radius],[Y Start]-[Y End]");
+				player.sendMessage(ChatColor.RED + "USE /aip mark [Name]:[Radius],[Y Radius]");
+				return false;
+			}
+			String[] sstring = arrayToString(args, " ", 1).split(":");
+			if (sstring.length == 1) { // We want to mark a point even if there is no radius specified.
+				// Mark the point.
+				markPlace(player, sstring[0], getConfiguration().getInt("radius-default", 25), true);
+				return true;
+			}
+			
+			// Some var stuff.
+			String name = sstring[0];
+			String lprms = sstring[1];
+			String[] parms = lprms.split(",");
+			
+			int rlimit = getConfiguration().getInt("radius-limit", 1000);
+			int r = 0;
+			if (parms.length > 0) { // Make sure there is a radius first.
+				r = Integer.parseInt(parms[0]);
+				// Check the radius.
+				if (r < 0 || r > rlimit) {
+					player.sendMessage(ChatColor.RED + "The radius must be between 0 and " + Integer.toString(rlimit) + "!");
+					return false;
+				}
+			}
 
-            // Our mark command.
-            if (args[0].equalsIgnoreCase("mark")) {
-                String[] sstring = arrayToString(args, " ", 1).split(":");
-                if (sstring.length == 1) { // We want to mark a point even if there is no radius specified.
-                    // Mark the point.
-                    markPlace(player, sstring[0], getConfiguration().getInt("radius-default", 25), true);
-                    return true;
-                }
-                // Some var stuff.
-                String name = sstring[0];
-                String lprms = sstring[1];
-                String[] parms = lprms.split(",");
-
-                int rlimit = getConfiguration().getInt("radius-limit", 1000);
-                int r = 0;
-                if (parms.length > 0) { // Make sure there is a radius first.
-                    r = Integer.parseInt(parms[0]);
-                    // Check the radius.
-                    if (r < 0 || r > rlimit) {
-                        player.sendMessage(ChatColor.RED + "The radius must be between 0 and " + Integer.toString(rlimit) + "!");
-                        return false;
-                    }
-                }
-
-
-                if (parms.length == 1) {  //Only Radius entered.
-                    try {
-                        // Mark the point.
-                        markPlace(player, name, r, true);
-                    } catch ( NumberFormatException e ) {
-                        player.sendMessage(ChatColor.RED + "Error in radius entry!");
-                        player.sendMessage(ChatColor.RED + "USE /aip mark [Name]:[Radius]");
-                        return false;
-                    }
-                } else if (parms.length == 2) {
-                    if (parms[1].contains("-")) { // Radius, Y begining, Y end entered.
-                        String[] oparms = parms[1].split("-");
-                        if (oparms.length == 2) {
-                            try {
-                                // Mark the point.
-                                markPlace(player, name, r, Integer.parseInt(oparms[0]), Integer.parseInt(oparms[1]));
-                            } catch ( NumberFormatException e ) {
-                                player.sendMessage(ChatColor.RED + "Error in data entry!");
-                                player.sendMessage(ChatColor.RED + "USE /aip mark [Name]:[Radius],[Y Start]-[Y End]");
-                                return false;
-                            }
-                        }
-                    } else { // Radius and Y radius entered.
-                        try {
-                            // Mark the point.
-                            markPlace(player, name, r, Integer.parseInt(parms[1]));
-                        } catch ( NumberFormatException e ) {
-                            player.sendMessage(ChatColor.RED + "Error in data entry!");
-                            player.sendMessage(ChatColor.RED + "USE /aip mark [Name]:[Radius],[Y Radius]");
-                            return false;
-                        }
-                    }
-                } 
-            } else if (args[0].equalsIgnoreCase("unmark")) { // The unmark command.
-                unmarkPlace(player);
-            } else if (args[0].equalsIgnoreCase("nearest")) { // The nearest command.
-                sendNearest(player);
-            }
-        }
+			if (parms.length == 1) {  //Only Radius entered.
+				try {
+					// Mark the point.
+					markPlace(player, name, r, true);
+				} catch ( NumberFormatException e ) {
+					player.sendMessage(ChatColor.RED + "Error in radius entry!");
+					player.sendMessage(ChatColor.RED + "USE /aip mark [Name]:[Radius]");
+					return false;
+				}
+			} else if (parms.length == 2) {
+				if (parms[1].contains("-")) { // Radius, Y begining, Y end entered.
+					String[] oparms = parms[1].split("-");
+					if (oparms.length == 2) {
+						try {
+							// Mark the point.
+							markPlace(player, name, r, Integer.parseInt(oparms[0]), Integer.parseInt(oparms[1]));
+						} catch ( NumberFormatException e ) {
+							player.sendMessage(ChatColor.RED + "Error in data entry!");
+							player.sendMessage(ChatColor.RED + "USE /aip mark [Name]:[Radius],[Y Start]-[Y End]");
+							return false;
+						}
+					}
+				} else { // Radius and Y radius entered.
+					try {
+						// Mark the point.
+						markPlace(player, name, r, Integer.parseInt(parms[1]));
+					} catch ( NumberFormatException e ) {
+						player.sendMessage(ChatColor.RED + "Error in data entry!");
+						player.sendMessage(ChatColor.RED + "USE /aip mark [Name]:[Radius],[Y Radius]");
+						return false;
+					}
+				}
+			}			
+		} else if (command.getName().equalsIgnoreCase("unmark")) { // The unmark command.
+			// Set up the player.
+			if (!checkPlayer()) return false;
+			Player player = (Player) sender;
+			
+			// Run the command.
+			unmarkPlace(player);
+		} else if (command.getName().equalsIgnoreCase("nearest")) { // The nearest command.
+			// Set up the player.
+			if (!checkPlayer()) return false;
+			Player player = (Player) sender;
+			
+			// Run the command.
+			sendNearest(player);
+		}		
         return true;
     }
+	
+	public void checkPlayer(CommandSender sender) {
+		if (!(sender instanceof Player)) { // Make sure its only a player tring to use the command.
+			sender.sendMessage("Only players can use this command");
+			return false;
+		}
+	}
 
+	// A function to convert a array to a string.
     public static String arrayToString(String[] a, String separator) {
         return arrayToString(a, separator, 0);
     }
