@@ -7,10 +7,9 @@ import org.bukkit.Location;
 
 public class Place implements Serializable {
 	
-    //private int x;
-    //private int y;
-    //private int z;
-    private Location placeLoc;
+    private int x;
+    private int y;
+    private int z;
     private int radius;
     private int xDist;
     private int yDist;
@@ -30,10 +29,9 @@ public class Place implements Serializable {
     }
 
     private void setPlace(Location loc, int rx, int ry, int rz, int radius, int world, String name, String ownername) {
-        //x = loc.getBlockX();
-        //y = loc.getBlockY();
-        //z = loc.getBlockZ();
-		placeLoc = loc;
+        x = loc.getBlockX();
+        y = loc.getBlockY();
+        z = loc.getBlockZ();
         xDist = rx;
         yDist = ry;
         zDist = rz;
@@ -63,29 +61,29 @@ public class Place implements Serializable {
             rangeX = (xDist == -1) ? true : ((x - xDist) <= loc.getBlockX() && (x + xDist) >= loc.getBlockX());
             rangeY = (yDist == -1) ? true : ((y - yDist) <= loc.getBlockY() && (y + yDist) >= loc.getBlockY());
             rangeZ = (zDist == -1) ? true : ((z - zDist) <= loc.getBlockZ() && (z + zDist) >= loc.getBlockZ());
-            return (rangeX && rangeY && rangeZ);
+            return (rangeX && rangeY && rangeZ && (world == (int) loc.getWorld().getId()));
         }
     }
 
-    public void setX(int x) {
-        this.x = x;
-    }
+//    public void setX(int x) {
+//        this.x = x;
+//    }
 
     public int getX() {
         return x;
     }
 
-    public void setY(int y) {
-        this.y = y;
-    }
+//    public void setY(int y) {
+//        this.y = y;
+//    }
 
     public int getY() {
         return y;
     }
 
-    public void setZ(int z) {
-        this.z = z;
-    }
+//    public void setZ(int z) {
+//        this.z = z;
+//    }
 
     public int getZ() {
         return z;
