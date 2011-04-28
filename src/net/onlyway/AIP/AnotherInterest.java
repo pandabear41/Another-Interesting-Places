@@ -24,6 +24,8 @@ public class AnotherInterest extends JavaPlugin {
     private final AnotherInterestPlayer player = new AnotherInterestPlayer(this);
     private final AnotherInterestVehicle vehicle = new AnotherInterestVehicle(this);
     private Places places;
+	
+	private static final Logger log = Logger.getLogger("Minecraft");
     
     private HashMap<Player,Place> current = new HashMap<Player,Place>();
     private HashMap<Player,Long> times = new HashMap<Player,Long>();
@@ -37,27 +39,47 @@ public class AnotherInterest extends JavaPlugin {
         // Odd problem with bukkit.
         places = new Places(this);
 
+		initFiles();
         // Load the old config if it exists.
         if (places.convertOld("places.txt", getServer()))
-            System.out.println("An old interesting places file was loaded.");
+            log.log(Level.INFO,"[AIP] An old interesting places file was loaded.");
 
         // Register out events.
         pm.registerEvent(Event.Type.PLAYER_JOIN,    player,  Priority.Monitor, this);
         pm.registerEvent(Event.Type.PLAYER_QUIT,    player,  Priority.Monitor, this);
         pm.registerEvent(Event.Type.PLAYER_MOVE,    player,  Priority.Normal, this);
         pm.registerEvent(Event.Type.VEHICLE_MOVE,   vehicle, Priority.Normal, this);
-
-        // Thanks Zoot.
-        // Write out the config if it does not exits.
-        getDataFolder().mkdirs(); // Make sure dir exists
-        File config_file = new File(getDataFolder(), "config.yml");
-        if (!config_file.isFile()) {
-            extractResourceTo("/config.yml", config_file.getPath());
-            System.out.println("A default config file was created for " + pdfFile + ". Please restart the server to ensure that the config is loaded.");
-        }
-
-        System.out.println(pdfFile.getName() + " version " + pdfFile.getVersion() + " has been loaded.");
+		
+		log.log(Level.INFO, pdfFile.getName() + " version " + pdfFile.getVersion() + " has been loaded.");
     }
+	
+	
+	public static void initFiles() {
+		File folder = this.getDataFolder();
+		boolean result = true;
+		if(!folder.exists()){
+			if(!folder.mkdir()){
+				result = false;
+				log.log(Level.SEVERE, "[AIP] Could not create data folder!");
+			}
+		}
+		configFile = new File(getDataFolder(), "config.yml");
+		log.log(Level.INFO, "[AIP] Config file: " + getDataFolder() + "\\" + "config.yml");
+		try {
+			if( !configFile.exists() )
+				extractResourceTo("/config.yml", configFile.getPath());
+
+			if( !configFile.canRead()) {
+				result = false;
+			}
+
+		} catch (IOException e) {
+			log.log(Level.SEVERE, "[AIP] Error creating data files: " + e.getMessage());
+		}
+
+		if(!result)
+			log.log(Level.INFO, "[AIP] Failed to initialize data files!");
+	}
 
     /**
      *

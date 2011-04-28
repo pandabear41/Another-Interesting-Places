@@ -45,9 +45,9 @@ public class Place implements Serializable {
     public double distance(Location loc)
     {
         double r = 0;
-        r += (xDist == -1) ? 0 : Math.pow( x - loc.getBlockX(), 2);
-        r += (yDist == -1) ? 0 : Math.pow( y - loc.getBlockY(), 2); 
-        r += (zDist == -1) ? 0 : Math.pow( z - loc.getBlockZ(), 2);
+        r += (xDist == -1) ? 0 : ( x - loc.getBlockX()) * ( x - loc.getBlockX());
+        r += (yDist == -1) ? 0 : ( y - loc.getBlockY()) * ( y - loc.getBlockY());
+        r += (zDist == -1) ? 0 : ( z - loc.getBlockZ()) * ( z - loc.getBlockZ());
         return Math.sqrt(r);
     }
 
