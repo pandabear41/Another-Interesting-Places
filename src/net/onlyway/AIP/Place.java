@@ -7,9 +7,10 @@ import org.bukkit.Location;
 
 public class Place implements Serializable {
 	
-    private int x;
-    private int y;
-    private int z;
+    //private int x;
+    //private int y;
+    //private int z;
+	private Location placeLoc;
     private int radius;
     private int xDist;
     private int yDist;
@@ -29,9 +30,10 @@ public class Place implements Serializable {
     }
 
     private void setPlace(Location loc, int rx, int ry, int rz, int radius, int world, String name, String ownername) {
-        x = loc.getBlockX();
-        y = loc.getBlockY();
-        z = loc.getBlockZ();
+        //x = loc.getBlockX();
+        //y = loc.getBlockY();
+        //z = loc.getBlockZ();
+		placeLoc = loc;
         xDist = rx;
         yDist = ry;
         zDist = rz;
