@@ -9,6 +9,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.bukkit.World;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -119,6 +120,16 @@ public class AnotherInterest extends JavaPlugin {
     {
         // Save when the plugin is disabled.
         places.updateData();
+    }
+    
+    public World getFirstWorld()
+    {
+    	return this.getServer().getWorlds().get(0);
+    }
+    
+    public World getWorld(String worldname)
+    {
+    	return this.getServer().getWorld(worldname);
     }
 
     @Override

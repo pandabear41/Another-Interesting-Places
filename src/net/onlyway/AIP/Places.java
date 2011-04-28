@@ -53,15 +53,21 @@ public class Places {
         try {
             BufferedReader reader = new BufferedReader( new FileReader( plugin.getDataFolder() + File.separator + filename ) );
             boolean b = true;
-            boolean v1_1 = false;
+            int version = 0;
             String s = reader.readLine();
             if ( s.equals( "version1.1" ) ) {
-                v1_1 = true;
+                version = 1;
                 s = reader.readLine();
+            } else if ( s.equals( "version1.2" )) {
+                version = 2;
             }
             while ( b ) {
                 try {
-                    addOld( s, v1_1, server );
+                    if (version == 2) {
+                       addv1_2( s, server); 
+                    } else {
+                       addOld( s, (version==1 ? true : false), server ); 
+                    }
                 }
                 catch ( Exception e ) {
                 }
@@ -75,6 +81,35 @@ public class Places {
         old_file.delete();
         this.updateData();
         return true;
+    }
+    
+    // Had to add this because the programmer added another version.
+    public void addv1_2(String s, Server server) {
+        Place myPlace = null;
+        int x, y, z, radius;
+        String name;
+        String[] xyz = s.split(" ", 2);
+        if (xyz[0].equalsIgnoreCase("xyz")) {
+                String[] args = xyz[1].split(" ", 8);
+                String worldname = args[0];
+                x = Integer.parseInt(args[1]);
+                y = Integer.parseInt(args[2]);
+                z = Integer.parseInt(args[3]);
+                int xDist = Integer.parseInt(args[4]);
+                int yDist = Integer.parseInt(args[5]);
+                int zDist = Integer.parseInt(args[6]);
+                name = args[7].replaceAll("##", "§");
+                myPlace = new Place(new Location(plugin.getWorld(worldname), x, y, z), xDist, yDist, zDist, (int) plugin.getWorld(worldname).getId(), name, "[None]");
+        } else {
+                String[] args = s.split(" ", 6);
+                String worldname = args[0];
+                x = Integer.parseInt(args[1]);
+                y = Integer.parseInt(args[2]);
+                z = Integer.parseInt(args[3]);
+                radius = Integer.parseInt(args[4]);
+                name = args[5].replaceAll("##", "§");
+                myPlace = new Place(new Location(plugin.getWorld(worldname), x, y, z), radius, -1, (int) plugin.getWorld(worldname).getId(), name,  "[None]");
+        }
     }
 
     // Parses the old format.
