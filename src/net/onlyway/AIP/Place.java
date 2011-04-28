@@ -10,7 +10,7 @@ public class Place implements Serializable {
     //private int x;
     //private int y;
     //private int z;
-	private Location placeLoc;
+    private Location placeLoc;
     private int radius;
     private int xDist;
     private int yDist;

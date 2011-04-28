@@ -1,8 +1,9 @@
 package net.onlyway.AIP;
 
-import org.bukkit.event.player.PlayerEvent;
+import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerListener;
 import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 
 public class AnotherInterestPlayer extends PlayerListener {
 
