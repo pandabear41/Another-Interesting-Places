@@ -13,16 +13,17 @@ public class AnotherInterestPlayer extends PlayerListener {
         this.plugin = plugin;
     }
     
-    @Override
-    public void onPlayerJoin(PlayerEvent event)
+	
+	@Override
+    public void onPlayerJoin( PlayerJoinEvent event )
     {
-        plugin.updateCurrent(event.getPlayer());
+        plugin.updateCurrent( event.getPlayer() );
     }
-    
+
     @Override
-    public void onPlayerQuit(PlayerEvent event)
+    public void onPlayerQuit( PlayerQuitEvent event )
     {
-    	plugin.removeCurrent(event.getPlayer());
+        plugin.removeCurrent( event.getPlayer() );
     }
     
     @Override
