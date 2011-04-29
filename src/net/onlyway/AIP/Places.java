@@ -110,6 +110,7 @@ public class Places {
                 name = args[5].replaceAll("##", "§");
                 myPlace = new Place(new Location(plugin.getWorld(worldname), x, y, z), radius, -1, (int) plugin.getWorld(worldname).getId(), name,  "[None]");
         }
+        places.add(myPlace);
     }
 
     // Parses the old format.

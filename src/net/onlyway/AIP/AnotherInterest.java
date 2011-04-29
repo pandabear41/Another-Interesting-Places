@@ -52,7 +52,7 @@ public class AnotherInterest extends JavaPlugin {
         pm.registerEvent(Event.Type.PLAYER_MOVE,    player,  Priority.Normal, this);
         pm.registerEvent(Event.Type.VEHICLE_MOVE,   vehicle, Priority.Normal, this);
 		
-        log.log(Level.INFO, "{0} version {1} has been loaded.", new Object[]{pdfFile.getName(), pdfFile.getVersion()});
+        log.log(Level.INFO, pdfFile.getName() + " version " + pdfFile.getVersion() + " has been loaded.");
     }
 	
 	
@@ -66,7 +66,7 @@ public class AnotherInterest extends JavaPlugin {
             }
         }
         File configFile = new File(getDataFolder(), "config.yml");
-        log.log(Level.INFO, "[AIP] Config file: {0}" + "\\" + "config.yml", getDataFolder());
+        log.log(Level.INFO, "[AIP] Config file: "+ getDataFolder() + "\\" + "config.yml" );
         try {
             if( !configFile.exists() )
                 extractResourceTo("/config.yml", configFile.getPath());
@@ -134,21 +134,22 @@ public class AnotherInterest extends JavaPlugin {
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String commandLabel, String[] args) {
+        // Set up the player.
+        if (!(sender instanceof Player)) {
+            sender.sendMessage("Only players can use this command");
+            return false;
+        }
+        Player player = (Player) sender;
+            
         if (command.getName().equalsIgnoreCase("mark")) { // The mark command.
-            // Set up the player.
-            if (!checkPlayer(sender)) return false;
-            Player player = (Player) sender;
+
 
             // Help to be displayed if no input
             if (args.length == 0) {
-                player.sendMessage(ChatColor.RED + "Syntax is:");
-                player.sendMessage(ChatColor.RED + "USE /aip mark [Name]");
-                player.sendMessage(ChatColor.RED + "USE /aip mark [Name]:[Radius]");
-                player.sendMessage(ChatColor.RED + "USE /aip mark [Name]:[Radius],[Y Start]-[Y End]");
-                player.sendMessage(ChatColor.RED + "USE /aip mark [Name]:[Radius],[Y Radius]");
+                player.sendMessage(ChatColor.WHITE + "Syntax is:");
                 return false;
             }
-            String[] sstring = arrayToString(args, " ", 1).split(":");
+            String[] sstring = arrayToString(args, " ", 0).split(":");
             if (sstring.length == 1) { // We want to mark a point even if there is no radius specified.
                 // Mark the point.
                 markPlace(player, sstring[0], getConfiguration().getInt("radius-default", 25), true);
@@ -163,11 +164,19 @@ public class AnotherInterest extends JavaPlugin {
             int rlimit = getConfiguration().getInt("radius-limit", 1000);
             int r = 0;
             if (parms.length > 0) { // Make sure there is a radius first.
-                r = Integer.parseInt(parms[0]);
-                // Check the radius.
-                if (r < 0 || r > rlimit) {
-                    player.sendMessage(ChatColor.RED + "The radius must be between 0 and " + Integer.toString(rlimit) + "!");
-                    return false;
+                try {
+                    r = Integer.parseInt(parms[0]);
+                    // Check the radius.
+                    if (r < 0 || r > rlimit) {
+                        player.sendMessage(ChatColor.RED + "The radius must be between 0 and " + Integer.toString(rlimit) + "!");
+                        return true;
+                    }
+                } catch ( NumberFormatException e ) {
+                    player.sendMessage(ChatColor.RED + "Error in radius entry!");
+                    player.sendMessage(ChatColor.RED + "USE /aip mark [Name]:[Radius]");
+                    player.sendMessage(ChatColor.RED + "USE /aip mark [Name]:[Radius],[Y Start]-[Y End]");
+                    player.sendMessage(ChatColor.RED + "USE /aip mark [Name]:[Radius],[Y Radius]");
+                    return true;
                 }
             }
 
@@ -178,7 +187,7 @@ public class AnotherInterest extends JavaPlugin {
                 } catch ( NumberFormatException e ) {
                     player.sendMessage(ChatColor.RED + "Error in radius entry!");
                     player.sendMessage(ChatColor.RED + "USE /aip mark [Name]:[Radius]");
-                    return false;
+                    return true;
                 }
             } else if (parms.length == 2) {
                 if (parms[1].contains("-")) { // Radius, Y begining, Y end entered.
@@ -190,7 +199,7 @@ public class AnotherInterest extends JavaPlugin {
                             } catch ( NumberFormatException e ) {
                                 player.sendMessage(ChatColor.RED + "Error in data entry!");
                                 player.sendMessage(ChatColor.RED + "USE /aip mark [Name]:[Radius],[Y Start]-[Y End]");
-                                return false;
+                                return true;
                             }
                     }
                 } else { // Radius and Y radius entered.
@@ -200,37 +209,24 @@ public class AnotherInterest extends JavaPlugin {
                     } catch ( NumberFormatException e ) {
                         player.sendMessage(ChatColor.RED + "Error in data entry!");
                         player.sendMessage(ChatColor.RED + "USE /aip mark [Name]:[Radius],[Y Radius]");
-                        return false;
+                        return true;
                     }
                 }
             }			
         } else if (command.getName().equalsIgnoreCase("unmark")) { // The unmark command.
-                // Set up the player.
-                if (!checkPlayer(sender)) return false;
-                Player player = (Player) sender;
-
-                // Run the command.
-                unmarkPlace(player);
+            // Run the command.
+            unmarkPlace(player);
         } else if (command.getName().equalsIgnoreCase("nearest")) { // The nearest command.
-                // Set up the player.
-                if (!checkPlayer(sender)) return false;
-                Player player = (Player) sender;
-
-                // Run the command.
-                sendNearest(player);
-        }		
+            // Run the command.
+            sendNearest(player);
+        } else if ((command.getName().equalsIgnoreCase("who") || command.getName().equalsIgnoreCase("where")) & !getConfiguration().getBoolean("no-who",false) ) { // The who and where command.		
+            // Run the command.
+            sendWho(player);
+        }
         return true;
     }
-	
-    public boolean checkPlayer(CommandSender sender) {
-        if (!(sender instanceof Player)) { // Make sure its only a player tring to use the command.
-            sender.sendMessage("Only players can use this command");
-            return false;
-        }
-        return false;
-    }
 
-	// A function to convert a array to a string.
+    // A function to convert a array to a string.
     public static String arrayToString(String[] a, String separator) {
         return arrayToString(a, separator, 0);
     }
@@ -273,6 +269,7 @@ public class AnotherInterest extends JavaPlugin {
 
         // Grab the nearest place that is in range of the player.
     	Place place = nearestPlaceInRange(player);
+        
         // DEBUG stuff.
         if (place != null && getConfiguration().getBoolean("debug",false)) player.sendMessage(ChatColor.WHITE + "Distance from:" + place.distance(player.getLocation()) + ". Y Axis:" + player.getLocation().getY() );
 
@@ -304,21 +301,22 @@ public class AnotherInterest extends JavaPlugin {
     	times.remove(player);
     }
 
-    // Not implemented yet. But this is the code from the old project.
-//    public void sendWho(Player player)
-//    {
-//    	Player[] players = getServer().getOnlinePlayers();
-//    	player.sendMessage(config.whoHead(Integer.toString(players.length)));
-//    	for (Player p : players) {
-//            Place place = nearestPlace(p);
-//
-//            if (place == null)
-//                player.sendMessage(config.whoLineNoPlace(p.getName()));
-//            else
-//                player.sendMessage(config.whoLinePlace(p.getName(), place.getName()));
-//    	}
-//    }
-//
+
+    public void sendWho(Player player)
+    {
+    	Player[] players = getServer().getOnlinePlayers();
+    	player.sendMessage(ChatColor.YELLOW + Integer.toString(players.length) + " " + getConfiguration().getString("who-text"));
+    	for (Player p : players) {
+            Place place = nearestPlaceInRange(p);
+
+            if (place == null)
+                player.sendMessage(ChatColor.WHITE + p.getName()+ " - wilderness");
+            else
+                player.sendMessage(ChatColor.WHITE + p.getName() + " - " + place.getName());
+    	}
+    }
+
+// I will add this later
 //    public void sendWho(Player player, String who)
 //    {
 //    	boolean b = false;
@@ -414,7 +412,6 @@ public class AnotherInterest extends JavaPlugin {
     		updateCurrent(p);
     }
 
-
     public void unmarkPlace(Player player)
     {
         // Check to see if only ops can use this command.
@@ -444,7 +441,5 @@ public class AnotherInterest extends JavaPlugin {
             player.sendMessage(ChatColor.RED + "You can't unmark a point you don't own!");
         }
     }
-    
-    
     
 }

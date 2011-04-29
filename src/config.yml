@@ -4,6 +4,10 @@
 entered-zone-text: "entering"
 # The text to display when a player is in no zone.
 no-zone-text: "entering wilderness"
+# The text to display when a player executes the who command.
+who-text: "player(s) online:"
+# Do you want who disabled?
+no-who: false
 # Will the zone left be displayed when leaving a zone.
 no-zone-name: false
 # Will only ops be able to use /mark.
