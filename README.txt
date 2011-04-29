@@ -23,7 +23,7 @@ or
 or
 /mark [Name]:[Radius],[Y Radius]
 or 
-/aip mark [Name]:[Radius],[Y Start]-[Y End]
+/mark [Name]:[Radius],[Y Start]-[Y End]
 
 DESCRIPTION:
 Mark sets a point and radius on the map that other players will see.
@@ -58,12 +58,11 @@ Add
 /aip who [Name]
 
 
-
 -- CHANGELOG --
 
 v0.7 - 4/28/2011
     * [ADD] Who command.
-    * [ADD] New data convertion for v1.2
+    * [ADD] New data conversion for v1.2
     * [CHANGE] The commands don't need /aip, just use the original commands.
     * [FIX] Breaks caused by Bukkit update.
     * [FIX] Changed config file generation.
