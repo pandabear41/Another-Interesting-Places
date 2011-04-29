@@ -1,12 +1,32 @@
 name: AnotherInterestingPlaces
 main: net.onlyway.AIP.AnotherInterest
-version: 0.6
+version: 0.7
 website: http://onlywaysoftware.com
 author: Pandabear41
-description: >
+description: 
   Another Interesting Places plugin lets you give names to different areas of your world. 
   When you wander around the would it will tell you when you arrive in different areas.
 commands:
+  mark:
+    description: Mark the current place.
+    usage: |
+           /<command> [Name]
+           OR /<command> [Name]:[Radius]
+           OR /<command> [Name]:[Radius],[Y Radius]
+           OR /<command> [Name]:[Radius],[Y Start]-[Y End]
+  unmark:
+    description: Unmark the current place
+    usage: |
+           /<command>
+  nearest:
+    description: Find out the nearest mark
+    usage: |
+           /<command>  
+  who:
+    aliases: [where]
+    description: Find out where people are
+    usage: |
+           /<command> [player]
   aip:
     description: Allows you to mark your positions on the map. Use "/aip" for help.
 
