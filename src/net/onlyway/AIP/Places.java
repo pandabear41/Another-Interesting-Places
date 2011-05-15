@@ -99,7 +99,7 @@ public class Places {
                 int yDist = Integer.parseInt(args[5]);
                 int zDist = Integer.parseInt(args[6]);
                 name = args[7].replaceAll("##", "§");
-                myPlace = new Place(new Location(plugin.getWorld(worldname), x, y, z), xDist, yDist, zDist, (int) plugin.getWorld(worldname).getId(), name, "[None]");
+                myPlace = new Place(new Location(plugin.getWorld(worldname), x, y, z), xDist, yDist, zDist, worldname, name, "[None]");
         } else {
                 String[] args = s.split(" ", 6);
                 String worldname = args[0];
@@ -108,7 +108,7 @@ public class Places {
                 z = Integer.parseInt(args[3]);
                 radius = Integer.parseInt(args[4]);
                 name = args[5].replaceAll("##", "§");
-                myPlace = new Place(new Location(plugin.getWorld(worldname), x, y, z), radius, -1, (int) plugin.getWorld(worldname).getId(), name,  "[None]");
+                myPlace = new Place(new Location(plugin.getWorld(worldname), x, y, z), radius, -1, worldname, name,  "[None]");
         }
         places.add(myPlace);
     }
@@ -132,16 +132,16 @@ public class Places {
             if ( xyz[ 0 ].equalsIgnoreCase( "xyz" ) ) {
                 String[] args = xyz[ 1 ].split( " ", 7 );
                 loc =  new Location(world, Integer.parseInt(args[0]), Integer.parseInt(args[1]), Integer.parseInt(args[2]));
-                myPlace = new Place(loc, Integer.parseInt(args[3]), Integer.parseInt(args[4]), Integer.parseInt(args[5]), (int) world.getId(), args[6].replaceAll( "##", "§" ), "[none]");
+                myPlace = new Place(loc, Integer.parseInt(args[3]), Integer.parseInt(args[4]), Integer.parseInt(args[5]), world.getName(), args[6].replaceAll( "##", "§" ), "[none]");
             } else {
                 String[] args = s.split( " ", 5 );
                 loc =  new Location(world, Integer.parseInt(args[0]), Integer.parseInt(args[1]), Integer.parseInt(args[2]));
-                myPlace = new Place(loc, Integer.parseInt(args[3]), -1, (int) world.getId(), args[4].replaceAll( "##", "§" ), "[none]");
+                myPlace = new Place(loc, Integer.parseInt(args[3]), -1, world.getName(), args[4].replaceAll( "##", "§" ), "[none]");
             }
         } else {
             String[] args = s.split( " ", 4 );
             loc =  new Location(world, Integer.parseInt(args[0]), Integer.parseInt(args[1]), Integer.parseInt(args[2]));
-            myPlace = new Place(loc, plugin.getConfiguration().getInt("radius-default", 25), -1, (int) world.getId(), args[3].replaceAll( "##", "§" ), "[none]");
+            myPlace = new Place(loc, plugin.getConfiguration().getInt("radius-default", 25), -1, world.getName(), args[3].replaceAll( "##", "§" ), "[none]");
         }
         places.add(myPlace);
     }
@@ -153,7 +153,7 @@ public class Places {
     }
 
     // Get the nearest place in the radius circle.
-    public Place getNearestRadius(Location loc, int world) {
+    public Place getNearestRadius(Location loc, String world) {
         Iterator placs = places.iterator();
 
         //Lazy mode activated.
@@ -165,7 +165,7 @@ public class Places {
         }
         while(placs.hasNext()) {
             current = (Place) placs.next();
-            if (nearest.distance(loc) > current.distance(loc) && current.inRange(loc) && current.getWorld() == world) {
+            if (nearest.distance(loc) > current.distance(loc) && current.inRange(loc) && current.getWorld().equals(world)) {
                 nearest = current;
             }
         }
@@ -173,12 +173,12 @@ public class Places {
         if (nearest == null )
             return null;
         else 
-            return (nearest.inRange(loc) && nearest.getWorld() == world) ? nearest : null ;
+            return (nearest.inRange(loc) && nearest.getWorld().equals(world)) ? nearest : null ;
 
     }
 
     // Get the nearest place.
-    public Place getNearest(Location loc, int world) {
+    public Place getNearest(Location loc, String world) {
         Iterator placs = places.iterator();
 
         //Lazy mode activated.
@@ -189,14 +189,14 @@ public class Places {
         }
         while(placs.hasNext()) {
             current = (Place) placs.next();
-            if (nearest.distance(loc) > current.distance(loc) && current.getWorld() == world) {
+            if (nearest.distance(loc) > current.distance(loc) && current.getWorld().equals(world)) {
                 nearest = current;
             }
         }
         if (nearest == null)
             return null;
         else
-            return (nearest.getWorld() == world) ? nearest : null ;
+            return (nearest.getWorld().equals(world)) ? nearest : null ;
     }
 
     void updateData()

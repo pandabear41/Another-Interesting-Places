@@ -31,12 +31,14 @@ public class AnotherInterest extends JavaPlugin {
     
     private HashMap<Player,Place> current = new HashMap<Player,Place>();
     private HashMap<Player,Long> times = new HashMap<Player,Long>();
+    
+    PluginDescriptionFile pdfFile;
 
     @Override
     public void onEnable()
     {
         PluginManager pm = getServer().getPluginManager();
-        PluginDescriptionFile pdfFile = this.getDescription();
+        pdfFile = this.getDescription();
 
         // Odd problem with bukkit.
         places = new Places(this);
@@ -142,8 +144,6 @@ public class AnotherInterest extends JavaPlugin {
         Player player = (Player) sender;
             
         if (command.getName().equalsIgnoreCase("mark")) { // The mark command.
-
-
             // Help to be displayed if no input
             if (args.length == 0) {
                 player.sendMessage(ChatColor.WHITE + "Syntax is:");
@@ -179,7 +179,6 @@ public class AnotherInterest extends JavaPlugin {
                     return true;
                 }
             }
-
             if (parms.length == 1) {  //Only Radius entered.
                 try {
                     // Mark the point.
@@ -222,6 +221,9 @@ public class AnotherInterest extends JavaPlugin {
         } else if ((command.getName().equalsIgnoreCase("who") || command.getName().equalsIgnoreCase("where")) & !getConfiguration().getBoolean("no-who",false) ) { // The who and where command.		
             // Run the command.
             sendWho(player);
+        } else if (command.getName().equalsIgnoreCase("aip")) {
+            // Version information
+            player.sendMessage(ChatColor.GREEN + "This server is using " + pdfFile.getName() + " version " + pdfFile.getVersion());
         }
         return true;
     }
@@ -249,7 +251,7 @@ public class AnotherInterest extends JavaPlugin {
     {
     	if (places == null)
     		return null;
-    	return places.getNearest(player.getLocation(), (int) player.getWorld().getId());
+    	return places.getNearest(player.getLocation(), player.getWorld().getName());
     }
 
     // Get the nearest place to the player that is in the radius range.
@@ -257,7 +259,7 @@ public class AnotherInterest extends JavaPlugin {
     {
     	if (places == null)
     		return null;
-    	return places.getNearestRadius(player.getLocation(), (int) player.getWorld().getId());
+    	return places.getNearestRadius(player.getLocation(), player.getWorld().getName());
     }
 
     // Update the players location and send out the text if needed.
@@ -398,10 +400,10 @@ public class AnotherInterest extends JavaPlugin {
     	Place mark = null;
     	if ( radius != -1 )
                 // Make a place with a radius.
-    		mark = new Place(loc, radius, ry, (int) player.getWorld().getId(), name, player.getDisplayName());
+    		mark = new Place(loc, radius, ry, player.getWorld().getName(), name, player.getDisplayName());
     	else
                 // Make a place with a custom radius.
-    		mark = new Place(loc, rx, ry, rz, (int) player.getWorld().getId(), name, player.getDisplayName());
+    		mark = new Place(loc, rx, ry, rz, player.getWorld().getName(), name, player.getDisplayName());
 
         // Add the place to the structure and save it.
     	places.getPlaces().add(mark);
