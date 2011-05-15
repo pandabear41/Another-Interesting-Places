@@ -60,6 +60,9 @@ Add
 
 -- CHANGELOG --
 
+v0.8 - 5/14/2011
+    * [CHANGE] Now using the world name rather than the ID.
+
 v0.7 - 4/28/2011
     * [ADD] Who command.
     * [ADD] New data conversion for v1.2
