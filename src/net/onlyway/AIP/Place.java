@@ -1,7 +1,6 @@
 package net.onlyway.AIP;
 
 import java.io.IOException;
-import java.io.Serializable;
 import java.io.Writer;
 import java.util.LinkedHashMap;
 import org.bukkit.ChatColor;
@@ -9,7 +8,6 @@ import org.bukkit.Location;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONStreamAware;
 import org.json.simple.JSONValue;
-
 
 public class Place implements JSONStreamAware {
 	
@@ -84,25 +82,13 @@ public class Place implements JSONStreamAware {
         }
     }
 
-//    public void setX(int x) {
-//        this.x = x;
-//    }
-
     public int getX() {
         return x;
     }
 
-//    public void setY(int y) {
-//        this.y = y;
-//    }
-
     public int getY() {
         return y;
     }
-
-//    public void setZ(int z) {
-//        this.z = z;
-//    }
 
     public int getZ() {
         return z;

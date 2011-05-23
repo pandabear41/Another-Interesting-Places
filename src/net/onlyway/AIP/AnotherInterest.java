@@ -21,7 +21,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 public class AnotherInterest extends JavaPlugin {
 	
-    public static final String DATA_FILE = "places.yml";
+    public static final String DATA_FILE = "places.json";
 
     private final AnotherInterestPlayer player = new AnotherInterestPlayer(this);
     private final AnotherInterestVehicle vehicle = new AnotherInterestVehicle(this);

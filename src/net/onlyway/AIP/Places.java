@@ -1,19 +1,12 @@
 package net.onlyway.AIP;
 
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.StringWriter;
 import java.io.Writer;
-import java.sql.Savepoint;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -26,25 +19,16 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
-import org.yaml.snakeyaml.DumperOptions;
-import org.yaml.snakeyaml.Yaml;
-import org.yaml.snakeyaml.constructor.Constructor;
-import org.yaml.snakeyaml.constructor.SafeConstructor;
-
 
 public class Places {
 
     private final AnotherInterest plugin;
     private ArrayList<Place> places = new ArrayList<Place>();
     
-    
-    
-
     public Places(final AnotherInterest plugin) 
     {
         this.plugin = plugin;
         JSONParser parser = new JSONParser();
-        
         
         try {
             BufferedReader reader = new BufferedReader(new FileReader(plugin.getDataFolder() + File.separator + AnotherInterest.DATA_FILE));
@@ -62,37 +46,6 @@ public class Places {
         } catch (IOException ex) {
             plugin.log.log(Level.SEVERE, "[AIP] The places file can't be opened!");
         }
-//        }
-        
-//        
-////            Yaml yaml = new Yaml(new SafeConstructor());
-////            // Open up the file.
-////
-////            FileInputStream reader = new FileInputStream(plugin.getDataFolder() + File.separator + AnotherInterest.DATA_FILE);
-////            for (Object data : yaml.loadAll(reader)) {
-////                try {
-////                    Place plac = (Place) data;
-////                    places.add(plac);
-////                } catch (Exception ex) {
-////                
-////                }
-////            }
-//            
-////            ObjectInputStream oin = new ObjectInputStream(reader);
-////
-////            Object obj = null ;
-////            try {
-////                // Read the place object and put it into the array.
-////                while ((obj = oin.readObject()) != null) {
-////                    if (obj instanceof Place) {
-////                        Place plac = (Place) obj;
-////                        places.add(plac);
-////                    }
-////                }
-////            } catch (ClassNotFoundException ex) {
-////            }
-//        } catch (IOException e) {
-//        }
     }
 
     // Converter for the old Interesting Places format.

@@ -13,9 +13,8 @@ public class AnotherInterestPlayer extends PlayerListener {
     {
         this.plugin = plugin;
     }
-    
 	
-	@Override
+    @Override
     public void onPlayerJoin( PlayerJoinEvent event )
     {
         plugin.updateCurrent( event.getPlayer() );
