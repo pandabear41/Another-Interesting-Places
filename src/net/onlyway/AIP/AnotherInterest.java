@@ -400,10 +400,10 @@ public class AnotherInterest extends JavaPlugin {
     	Place mark = null;
     	if ( radius != -1 )
                 // Make a place with a radius.
-    		mark = new Place(loc, radius, ry, player.getWorld().getName(), name, player.getDisplayName());
+    		mark = new Place(loc, radius, ry, player.getWorld().getName(), name, player.getName());
     	else
                 // Make a place with a custom radius.
-    		mark = new Place(loc, rx, ry, rz, player.getWorld().getName(), name, player.getDisplayName());
+    		mark = new Place(loc, rx, ry, rz, player.getWorld().getName(), name, player.getName());
 
         // Add the place to the structure and save it.
     	places.getPlaces().add(mark);
@@ -430,7 +430,8 @@ public class AnotherInterest extends JavaPlugin {
     	}
 
         // Make sure that the player is the owner so griefers don't remove other peoples places.
-    	if (player.isOp() || player.getDisplayName().equals(nearest.getOwner()) || nearest.getOwner().equals("[none]") ) {
+        
+    	if (player.isOp() || player.getName().equals(nearest.getOwner()) || nearest.getOwner().equals("[none]") ) {
             // Remove the nearest place and save the file.
             places.getPlaces().remove(nearest);
             places.updateData();
