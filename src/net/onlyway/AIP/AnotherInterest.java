@@ -44,6 +44,7 @@ public class AnotherInterest extends JavaPlugin {
         places = new Places(this);
 
         initFiles();
+        getConfiguration().load();
         
         // Load the old config if it exists.
         if (places.convertOld("places.txt", getServer()))
