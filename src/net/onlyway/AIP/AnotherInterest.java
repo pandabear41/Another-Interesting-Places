@@ -21,13 +21,13 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 public class AnotherInterest extends JavaPlugin {
 	
-    public static final String DATA_FILE = "places.dat";
+    public static final String DATA_FILE = "places.yml";
 
     private final AnotherInterestPlayer player = new AnotherInterestPlayer(this);
     private final AnotherInterestVehicle vehicle = new AnotherInterestVehicle(this);
     private Places places;
 	
-	private static final Logger log = Logger.getLogger("Minecraft");
+    public static final Logger log = Logger.getLogger("Minecraft");
     
     private HashMap<Player,Place> current = new HashMap<Player,Place>();
     private HashMap<Player,Long> times = new HashMap<Player,Long>();

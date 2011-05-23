@@ -1,22 +1,41 @@
 package net.onlyway.AIP;
 
+import java.io.IOException;
 import java.io.Serializable;
+import java.io.Writer;
+import java.util.LinkedHashMap;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
+import org.json.simple.JSONObject;
+import org.json.simple.JSONStreamAware;
+import org.json.simple.JSONValue;
 
 
-public class Place implements Serializable {
+public class Place implements JSONStreamAware {
 	
-    private int x;
-    private int y;
-    private int z;
-    private int radius;
-    private int xDist;
-    private int yDist;
-    private int zDist;
-    private String worldname;
-    private String name;
-    private String ownername;
+    protected int x;
+    protected int y;
+    protected int z;
+    protected int radius;
+    protected int xDist;
+    protected int yDist;
+    protected int zDist;
+    protected String worldname;
+    protected String name;
+    protected String ownername;
+    
+    public Place(JSONObject place) {
+        if (place.containsKey("x")) x = ((Long) place.get("x")).intValue();
+        if (place.containsKey("y")) y = ((Long) place.get("y")).intValue();
+        if (place.containsKey("z")) z = ((Long) place.get("z")).intValue();
+        if (place.containsKey("radius")) radius = ((Long) place.get("radius")).intValue();
+        if (place.containsKey("xDist")) xDist = ((Long) place.get("xDist")).intValue();
+        if (place.containsKey("yDist")) yDist = ((Long) place.get("yDist")).intValue();
+        if (place.containsKey("zDist")) zDist = ((Long) place.get("zDist")).intValue();
+        if (place.containsKey("worldname")) worldname = (String) place.get("worldname");
+        if (place.containsKey("name")) name = (String) place.get("name");
+        if (place.containsKey("ownername")) ownername = (String) place.get("ownername");
+    }
 
     public Place(Location loc, int radius, int ignoreY, String world, String name, String ownername)
     {
@@ -141,6 +160,21 @@ public class Place implements Serializable {
     public String toString() {
 
         return ChatColor.WHITE + name + " [" + Integer.toString(x) + ", " + Integer.toString(y) + ", " + Integer.toString(z) + "] Radius:[" + Integer.toString(xDist) + ", " + Integer.toString(yDist) + ", " + Integer.toString(zDist) + "]";
+    }
+
+    public void writeJSONString(Writer writer) throws IOException {
+        LinkedHashMap obj = new LinkedHashMap();
+        obj.put("x", x);
+        obj.put("y", y);
+        obj.put("z", z);
+        obj.put("radius", radius);
+        obj.put("xDist", xDist);
+        obj.put("yDist", yDist);
+        obj.put("zDist", zDist);
+        obj.put("worldname", worldname);
+        obj.put("name", name);
+        obj.put("ownername", ownername);
+        JSONValue.writeJSONString(obj, writer);
     }
 	
 }
