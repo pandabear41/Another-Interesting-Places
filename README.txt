@@ -52,15 +52,23 @@ Who displays the logged in players and the zones that they are in.
 -- TODO --
 
 Add 
-/aip mark [Name]:[X],[Y],[Z],[Dx],[Dy],[Dz]
+/mark [Name]:[X],[Y],[Z],[Dx],[Dy],[Dz]
 
 Add 
-/aip who [Name]
+/who [Name]
+
+Add
+/aip tp [player] [place]
 
 
 -- CHANGELOG --
 
-v0.8 - 5/14/2011
+v0.9 - 5/14/2011
+    * [FIX] Problem when generating the config the user sees "null" until the server is restarted.
+    * [FIX] User must be in the area that he wants to unmark.
+    * [FIX] Not using the players real name was using their alias.
+    * [FIX] Problem with importing  the v1.2 file.
+    * [CHANGE] Now using json rather than a object writer. It allows the user to edit the points manually.
     * [CHANGE] Now using the world name rather than the ID.
 
 v0.7 - 4/28/2011

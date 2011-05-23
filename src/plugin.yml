@@ -1,6 +1,6 @@
 name: AnotherInterestingPlaces
 main: net.onlyway.AIP.AnotherInterest
-version: 0.8
+version: 0.9
 website: http://onlywaysoftware.com
 author: Pandabear41
 description: 
@@ -28,5 +28,5 @@ commands:
     usage: |
            /<command> [player]
   aip:
-    description: Allows you to mark your positions on the map. Use "/aip" for help.
+    description: Allows you to mark your creations on the map. Use "/aip" for help.
 
