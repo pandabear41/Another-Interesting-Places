@@ -43,7 +43,8 @@ public class AnotherInterest extends JavaPlugin {
         // Odd problem with bukkit.
         places = new Places(this);
 
-		initFiles();
+        initFiles();
+        
         // Load the old config if it exists.
         if (places.convertOld("places.txt", getServer()))
             log.log(Level.INFO,"[AIP] An old interesting places file was loaded.");
@@ -346,7 +347,7 @@ public class AnotherInterest extends JavaPlugin {
     {
     	Place nearest = nearestPlace(player);
     	if (nearest != null)
-    		player.sendMessage(nearest.toString());
+            player.sendMessage(nearest.toString());
     }
 
     // One mark command that is not needed.
@@ -423,7 +424,7 @@ public class AnotherInterest extends JavaPlugin {
     	}
 
         // Check to see if there is even a place to unmark.
-    	Place nearest = nearestPlace(player);
+    	Place nearest = nearestPlaceInRange(player);
         if (nearest == null) {
     		player.sendMessage(ChatColor.RED + "Nothing to unmark!");
     		return;
